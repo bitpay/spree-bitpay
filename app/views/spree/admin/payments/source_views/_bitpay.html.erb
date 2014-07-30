@@ -1,0 +1,18 @@
+<% 	invoice = @payment.source.find_invoice  %>
+
+<div class="bitpay_invoice_details">
+	<h3>Bitpay Invoice Details</h3>
+	<pre><%= JSON.pretty_generate(invoice) %></pre>
+</div>
+
+<div class="bitpay_invoice_details">
+	<h3>Invoice</h3>
+	<iframe id="bitpay_invoice_iframe"
+			src="<%= j bitpay_view_invoice_url(source_id: @payment.source).html_safe %>"
+			scrolling="no" 
+			allowtransparency="true" 
+			frameborder="0">
+	</iframe>
+	<br/>
+	<%= link_to invoice["id"], invoice["url"], {target: "_new"} %>
+</div>

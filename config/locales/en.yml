@@ -1,0 +1,10 @@
+en:
+  spree:
+    bitpay_cancel: "Choose another payment method"
+    bitpay_checkout_error: "Error with Bitcoin checkout"
+    bitpay_payment_completed: "Thank you for your payment."
+    bitpay_payment_instructions: |
+      Please pay the invoice above to continue.
+      The page will automatically refresh in a few seconds when transaction is broadcast.
+    bitpay_payment_method: "Instructions will be provided on the confirmation page."
+    bitpay_view_invoice: "Continue to Invoice"
