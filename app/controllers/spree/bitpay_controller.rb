@@ -14,7 +14,7 @@ module Spree
 		# TODO: If there is more than 1, raise exception (can handle this corner case later)
 		payment = order.payments.valid.first
 
-		puts "Heres that payment: #{payment.inspect}"
+		logger.debug "Found payment: #{payment.inspect}"
 
 		case payment.state
 			when "checkout"
@@ -46,9 +46,9 @@ module Spree
 		# Find payment in processing state
 		# TODO: is there a better way to look for this 
 		order.payments.with_state("processing").each do |payment| 
-			puts "in payment"
+			logger.debug "in payment"
 			if (payment.payment_method.is_a? Spree::PaymentMethod::Bitpay)
-				puts "cancelling bp"
+				logger.debug "cancelling bp"
 				payment.failure!				
 			end
 		end
@@ -73,7 +73,7 @@ module Spree
 	def notification
 
 		# TODO:  Should this validate message origin somehow?  Compare to prefs from PaymentMethod?
-		# Should not be fatal because we are re-validating all data provided
+		# Should not be fatal because we are re-validating all data provided		
 
 		posData = JSON.parse(params["posData"])
 
@@ -86,7 +86,7 @@ module Spree
 		payment = order.payments.find_by(identifier: payment_id) || raise(ActiveRecord::RecordNotFound)
 
 		invoice = payment.source.find_invoice
-		puts("Bitpay Invoice Content: " + invoice.to_json)
+		logger.debug("Bitpay Invoice Content: " + invoice.to_json)
 		process_invoice(invoice)
 
 		render text: "", status: 200
@@ -121,16 +121,16 @@ module Spree
         fullNotifications: "true"
       }
 
-      puts "Requesting Invoice with params: #{invoice_params}"
+      logger.debug "Requesting Invoice with params: #{invoice_params}"
       invoice = payment.payment_method.get_bitpay_client.post 'invoice', invoice_params
-      puts "Invoice Generated: #{invoice.inspect}"
+      logger.debug "Invoice Generated: #{invoice.inspect}"
 
       return invoice
     end
 
     # Process the invoice and adjust order state accordingly
     def process_invoice(invoice)
-    	puts "Processing Bitpay invoice"
+    	logger.debug "Processing Bitpay invoice"
 
 		# Extract posData
 		posData = JSON.parse(invoice["posData"])
@@ -139,12 +139,14 @@ module Spree
 		order_number = invoice["orderID"]
 		invoice_id = invoice["id"]
 		payment_id = posData["paymentID"]
+		status = invoice["status"]
+		exception_status = invoice["exceptionStatus"]
 		
 		payment = Spree::Payment.find_by(identifier: payment_id) || raise(ActiveRecord::RecordNotFound)
 
-		puts "Found Payment: #{payment.inspect}"
+		logger.debug "Found Payment: #{payment.inspect}"
 
-		case invoice["status"]
+		case status
 			when "new"
 				payment.started_processing
 			when "paid" 
@@ -152,11 +154,21 @@ module Spree
 			when "confirmed", "complete"
 				payment.complete
 			when "expired"
-				payment.failure
+				# Abandoned invoices should be transitioned to "invalid" state
+				if (exception_status == "false")
+					payment.void!
+				else
+					unless payment.state == 'failed'
+						payment.failure!
+					end
+				end
 			when "invalid"
-				payment.failure
+				unless payment.state == 'failed' 
+					payment.failure!
+				end
+				# TODO: Flag as "risky" if possible
 			else
-				puts "Unexpected status '#{invoice["status"]}'"
+				logger.debug "Unexpected status '#{invoice["status"]}'"
 		end
 
 		payment.order.update!
@@ -165,12 +177,12 @@ module Spree
 			payment.order.next
 
 			if (!payment.order.complete?)
-				puts "TODO: Error handling if order can't be transitioned"	
+				logger.debug "TODO: Error handling if order can't be transitioned"	
 			end
 		end
 
-		puts "New Payment State: #{payment.state}"
-		puts "New Order State: #{payment.order.state}"
+		logger.debug "New Payment State: #{payment.state}"
+		logger.debug "New Order State: #{payment.order.state}"
 
     end
 
