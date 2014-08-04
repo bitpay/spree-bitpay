@@ -12,6 +12,7 @@ Gem::Specification.new do |s|
   s.summary       = 'BitPay bitcoin payments plugin'
   s.homepage      = 'https://bitpay.com'
   s.version       = '0.1.0'
+  s.required_ruby_version = '>= 1.9.3'
 
   s.files         = `git ls-files -z`.split("\x0")
   s.test_files    = Dir["spec/**/*"]
@@ -20,7 +21,8 @@ Gem::Specification.new do |s|
   s.add_dependency 'spree_core', '~> 2.2.0'
   s.add_dependency 'bitpay-client'
   
-  s.add_development_dependency 'capybara', '~> 2.1'
+  s.add_development_dependency 'spree_sample'
+  s.add_development_dependency 'capybara'
   s.add_development_dependency 'coffee-rails'
   s.add_development_dependency 'database_cleaner'
   s.add_development_dependency 'factory_girl', '~> 4.4'
