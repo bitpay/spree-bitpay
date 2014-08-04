@@ -1,6 +1,7 @@
-# spree_bitpay
+# spree_bitpay 
+[![Build Status](https://travis-ci.org/heisler3030/spree_bitpay.svg)](https://travis-ci.org/heisler3030/spree_bitpay)
 
-BitPay Payments connector for SpreeCommerce RoR storefront.
+BitPay Payments connector for SpreeCommerce RoR storefront. 
 
 ## Installation
 
