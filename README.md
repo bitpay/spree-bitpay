@@ -18,7 +18,7 @@ Or install it yourself as:
 
 Then run 
 
-    $ rails generate spree_bitpay
+    $ rails generate spree_bitpay:install
 
 ## Usage
 
