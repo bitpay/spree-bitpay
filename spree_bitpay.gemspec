@@ -18,11 +18,13 @@ Gem::Specification.new do |s|
   s.test_files    = Dir["spec/**/*"]
   s.require_paths = ["lib"]
 
-  s.add_dependency 'spree_core', '~> 2.2.0'
+  s.add_dependency 'spree', '~> 2.2.0'
+  s.add_dependency 'spree_auth_devise'
   s.add_dependency 'bitpay-client'
   
   s.add_development_dependency 'spree_sample'
   s.add_development_dependency 'capybara', '~> 2.1'
+  s.add_development_dependency 'launchy'
   s.add_development_dependency 'coffee-rails'
   s.add_development_dependency 'database_cleaner'
   s.add_development_dependency 'factory_girl', '~> 4.4'
@@ -32,5 +34,6 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'selenium-webdriver'
   s.add_development_dependency 'simplecov'
   s.add_development_dependency 'sqlite3'
+  s.add_development_dependency 'pry'
 
 end

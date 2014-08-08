@@ -19,6 +19,7 @@ require 'rspec/rails'
 require 'capybara/rspec'
 require 'database_cleaner'
 require 'ffaker'
+require 'pry'
 
 # Requires supporting ruby files with custom matchers and macros, etc,
 # in spec/support/ and its subdirectories.
@@ -39,6 +40,11 @@ RSpec.configure do |config|
   # Deprecation Stuff
   config.expose_current_running_example_as :example
   config.infer_spec_type_from_file_location!
+
+  # For login methods
+  config.extend Spree::TestingSupport::AuthorizationHelpers::Controller, :type => :controller
+  config.extend Spree::TestingSupport::AuthorizationHelpers::Controller, :type => :feature
+  config.extend Spree::TestingSupport::AuthorizationHelpers::Request, :type => :feature
 
 
   config.include FactoryGirl::Syntax::Methods
@@ -63,30 +69,49 @@ RSpec.configure do |config|
   config.color = true
 
   # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures
-  config.fixture_path = "#{::Rails.root}/spec/fixtures"
+#  config.fixture_path = "#{::Rails.root}/spec/fixtures"
 
   # Capybara javascript drivers require transactional fixtures set to false, and we use DatabaseCleaner
   # to cleanup after each test instead.  Without transactional fixtures set to false the records created
   # to setup a test will be unavailable to the browser, which runs under a separate server instance.
-  config.use_transactional_fixtures = false
+#  config.use_transactional_fixtures = false
 
-  # Ensure Suite is set to use transactions for speed.
-  config.before :suite do
-    DatabaseCleaner.strategy = :transaction
-    DatabaseCleaner.clean_with :truncation
-  end
+#   # Ensure Suite is set to use transactions for speed.
+#   config.before :suite do
+#     DatabaseCleaner.strategy = :transaction
+#     DatabaseCleaner.clean_with :truncation
+#   end
 
-# Before each spec check if it is a Javascript test and switch between using database transactions or not where necessary.
-  config.before :each do
-    DatabaseCleaner.strategy = example.metadata[:js] ? :truncation : :transaction
-    DatabaseCleaner.start
-  end
+# # Before each spec check if it is a Javascript test and switch between using database transactions or not where necessary.
+#   config.before :each do
+#     DatabaseCleaner.strategy = example.metadata[:js] ? :truncation : :transaction
+#     DatabaseCleaner.start
+#   end
 
-  # After each spec clean the database.
-  config.after :each do
-    DatabaseCleaner.clean
+#   # After each spec clean the database.
+#   config.after :each do
+#     DatabaseCleaner.clean
+#   end
+
+
+  # In event of errors, open page
+  config.after do
+    if example.metadata[:type] == :feature and example.exception.present?
+      save_and_open_page
+    end
   end
 
   config.fail_fast = ENV['FAIL_FAST'] || false
   config.order = "random"
+end
+
+
+def login
+  puts "yo I'm here"
+  visit admin_login_path
+  fill_in 'Email', with: "spree123@example.com"
+  fill_in 'Password', with: "spree123"
+  puts "yo I'm here 2"
+  click_on "Login"
+  puts "yo I'm here 3"
 end
