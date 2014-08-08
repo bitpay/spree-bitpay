@@ -34,6 +34,12 @@ require 'spree/testing_support/url_helpers'
 require 'spree_bitpay/factories'
 
 RSpec.configure do |config|
+
+  # Deprecation Stuff
+  config.expose_current_running_example_as :example
+  config.infer_spec_type_from_file_location!
+
+
   config.include FactoryGirl::Syntax::Methods
 
   # == URL Helpers
@@ -68,7 +74,7 @@ RSpec.configure do |config|
     DatabaseCleaner.clean_with :truncation
   end
 
-  # Before each spec check if it is a Javascript test and switch between using database transactions or not where necessary.
+# Before each spec check if it is a Javascript test and switch between using database transactions or not where necessary.
   config.before :each do
     DatabaseCleaner.strategy = example.metadata[:js] ? :truncation : :transaction
     DatabaseCleaner.start
