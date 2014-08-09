@@ -41,12 +41,6 @@ RSpec.configure do |config|
   config.expose_current_running_example_as :example
   config.infer_spec_type_from_file_location!
 
-  # For login methods
-  config.extend Spree::TestingSupport::AuthorizationHelpers::Controller, :type => :controller
-  config.extend Spree::TestingSupport::AuthorizationHelpers::Controller, :type => :feature
-  config.extend Spree::TestingSupport::AuthorizationHelpers::Request, :type => :feature
-
-
   config.include FactoryGirl::Syntax::Methods
 
   # == URL Helpers
@@ -105,13 +99,11 @@ RSpec.configure do |config|
   config.order = "random"
 end
 
-
-def login
-  puts "yo I'm here"
+# Login Helper Method
+def login_admin
+  admin = create(:admin_user)
   visit admin_login_path
-  fill_in 'Email', with: "spree123@example.com"
-  fill_in 'Password', with: "spree123"
-  puts "yo I'm here 2"
+  fill_in 'Email', with: admin.email
+  fill_in 'Password', with: 'secret'
   click_on "Login"
-  puts "yo I'm here 3"
 end
