@@ -1,10 +1,17 @@
 require 'spec_helper'
 
-feature "plugin configuration", js: true, type: :feature do
+feature "Bitpay Plugin", js: true, type: :feature do
 
-	scenario "can be added and configured" do
+	# NOTE: Tests require a properly populated test DB as per testapp.sh.
+	# Not all tests are idempotent - DB may require manual reset after test failure
 
-		login_admin
+	xscenario "can be configured by admin" do
+
+		admin = create(:admin_user)
+		visit admin_login_path  
+		fill_in 'Email', with: admin.email
+		fill_in 'Password', with: 'secret'
+		click_button "Login"		
 		visit new_admin_payment_method_path
 		# Should show up as a provider
 		expect(page).to have_selector('#gtwy-type option[value="Spree::PaymentMethod::Bitpay"]'), "Not visible in drop down"
@@ -23,9 +30,41 @@ feature "plugin configuration", js: true, type: :feature do
 		
 		fill_in "payment_method_bitpay_preferred_api_endpoint", with: "https://test.bitpay.com/api"
 		fill_in "payment_method_bitpay_preferred_api_key", with: "rOlmMQm5WmN8E21fvyCpt66iKeQ4aMZJU02sfTCo6M"
+		select "Test", from: "gtwy-env"
 
 		click_on "Update"				
 		expect(page).to have_selector('.success'), "No success message"
+		visit admin_logout_path
 
 	end	
+
+	scenario "can display invoice" do
+		user = create(:user_with_addreses)
+		visit login_path
+		fill_in 'Email', with: user.email
+		fill_in 'Password', with: 'secret'
+		click_button "Login"
+
+		expect(current_path).to eq(root_path), "User Login failed"
+
+		click_on "Ruby on Rails Tote"
+		click_button "Add To Cart"
+		click_button "Checkout"
+		click_button "Save and Continue" # Confirm Address
+		click_button "Save and Continue" # Confirm Delivery Options
+		choose "Bitcoin"
+
+		#TODO expect image is visible
+
+		expect { click_button "Save and Continue" }.to change(Spree::BitpayInvoice, :count).by(1)  # Confirm Payment Options
+		expect(current_path).to end_with "confirm"
+
+		click_button "Place Order"
+
+		page.within_frame 'bitpay_invoice_iframe' do
+		  expect(page).to have_content("Pay with Bitcoin")
+		end
+
+	end
+
 end

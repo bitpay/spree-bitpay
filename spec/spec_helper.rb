@@ -17,7 +17,7 @@ require File.expand_path('../dummy/config/environment.rb',  __FILE__)
 
 require 'rspec/rails'
 require 'capybara/rspec'
-require 'database_cleaner'
+#require 'database_cleaner'
 require 'ffaker'
 require 'pry'
 
@@ -70,22 +70,22 @@ RSpec.configure do |config|
   # to setup a test will be unavailable to the browser, which runs under a separate server instance.
   config.use_transactional_fixtures = false
 
-   # Ensure Suite is set to use transactions for speed.
-   config.before :suite do
-     DatabaseCleaner.strategy = :transaction
-     #DatabaseCleaner.clean_with :truncation
-   end
+   # # Ensure Suite is set to use transactions for speed.
+   # config.before :suite do
+   #   DatabaseCleaner.strategy = :transaction
+   #   #DatabaseCleaner.clean_with :truncation
+   # end
 
-   # Before each spec check if it is a Javascript test and switch between using database transactions or not where necessary.
-   config.before :each do
-     DatabaseCleaner.strategy = example.metadata[:js] ? :truncation : :transaction
-     DatabaseCleaner.start
-   end
+   # # Before each spec check if it is a Javascript test and switch between using database transactions or not where necessary.
+   # config.before :each do
+   #   DatabaseCleaner.strategy = example.metadata[:js] ? :truncation : :transaction
+   #   DatabaseCleaner.start
+   # end
 
-   # After each spec clean the database.
-   config.after :each do
-     DatabaseCleaner.clean
-   end
+   # # After each spec clean the database.
+   # config.after :each do
+   #   DatabaseCleaner.clean
+   # end
 
 
   # In event of errors, open page
@@ -97,14 +97,5 @@ RSpec.configure do |config|
 
   config.fail_fast = true
   #config.fail_fast = ENV['FAIL_FAST'] || false
-  config.order = "random"
-end
-
-# Login Helper Method
-def login_admin
-  admin = create(:admin_user)
-  visit admin_login_path  
-  fill_in 'Email', with: admin.email
-  fill_in 'Password', with: 'secret'
-  click_on "Login"
+  #config.order = "random"
 end
