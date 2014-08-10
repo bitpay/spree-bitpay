@@ -68,41 +68,42 @@ RSpec.configure do |config|
   # Capybara javascript drivers require transactional fixtures set to false, and we use DatabaseCleaner
   # to cleanup after each test instead.  Without transactional fixtures set to false the records created
   # to setup a test will be unavailable to the browser, which runs under a separate server instance.
-#  config.use_transactional_fixtures = false
+  config.use_transactional_fixtures = false
 
-#   # Ensure Suite is set to use transactions for speed.
-#   config.before :suite do
-#     DatabaseCleaner.strategy = :transaction
-#     DatabaseCleaner.clean_with :truncation
-#   end
+   # Ensure Suite is set to use transactions for speed.
+   config.before :suite do
+     DatabaseCleaner.strategy = :transaction
+     #DatabaseCleaner.clean_with :truncation
+   end
 
-# # Before each spec check if it is a Javascript test and switch between using database transactions or not where necessary.
-#   config.before :each do
-#     DatabaseCleaner.strategy = example.metadata[:js] ? :truncation : :transaction
-#     DatabaseCleaner.start
-#   end
+   # Before each spec check if it is a Javascript test and switch between using database transactions or not where necessary.
+   config.before :each do
+     DatabaseCleaner.strategy = example.metadata[:js] ? :truncation : :transaction
+     DatabaseCleaner.start
+   end
 
-#   # After each spec clean the database.
-#   config.after :each do
-#     DatabaseCleaner.clean
-#   end
+   # After each spec clean the database.
+   config.after :each do
+     DatabaseCleaner.clean
+   end
 
 
   # In event of errors, open page
   config.after do
     if example.metadata[:type] == :feature and example.exception.present?
-      save_and_open_page
+      save_and_open_screenshot
     end
   end
 
-  config.fail_fast = ENV['FAIL_FAST'] || false
+  config.fail_fast = true
+  #config.fail_fast = ENV['FAIL_FAST'] || false
   config.order = "random"
 end
 
 # Login Helper Method
 def login_admin
   admin = create(:admin_user)
-  visit admin_login_path
+  visit admin_login_path  
   fill_in 'Email', with: admin.email
   fill_in 'Password', with: 'secret'
   click_on "Login"
