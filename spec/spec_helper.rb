@@ -35,8 +35,12 @@ require 'spree/testing_support/url_helpers'
 # Requires factories defined in lib/spree_bitpay/factories.rb
 require 'spree_bitpay/factories'
 
-# Use Webkit driver for compatibility with Travis CI
+# Use Poltergeist driver for compatibility with Travis CI, and tell it to ignore JS errors
 require 'capybara/poltergeist'
+Capybara.register_driver :poltergeist do |app|
+  Capybara::Poltergeist::Driver.new(app, :js_errors => false)
+end
+
 Capybara.javascript_driver = :poltergeist
 
 RSpec.configure do |config|
