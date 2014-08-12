@@ -5,7 +5,7 @@ feature "Bitpay Plugin", js: true, type: :feature do
 	# NOTE: Tests require a properly populated test DB as per testapp.sh.
 	# Not all tests are idempotent - DB may require manual reset after test failure
 
-	xscenario "can be configured by admin" do
+	scenario "can be configured by admin" do
 
 		admin = create(:admin_user)
 		visit admin_login_path  
