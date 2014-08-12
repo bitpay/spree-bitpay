@@ -92,21 +92,23 @@ module Spree
 		render text: "", status: 200
 	end
 
+	# Reprocess Invoice and update order status 
+	#
+	def refresh
+		payment = Spree::Payment.find(params[:payment])  # Retrieve payment by ID
+		invoice = payment.source.find_invoice  # Get associated invoice
+		process_invoice(invoice)	# Re-process invoice
+		redirect_to request.referrer, notice: Spree.t(:bitpay_payment_updated)
+	end
+
 #######################################################################
 ###    Private Methods
 #######################################################################
 
 	private
 
-	# # Returns the PaymentMethod object
-	# def bitpay(pmid)
-	# 	pm = Spree::PaymentMethod.find(pmid)
-	# 	if !(pm.is_a? Spree::PaymentMethod::Bitpay)
-	# 		raise "Not a BitPay payment type"
-	# 	end
-	# 	pm
-	# end
-
+	# Call Bitpay API and return new JSON invoice object
+    #
     def new_invoice(order, payment)
 
       # Have to encode this into a string for proper handling by API
@@ -129,6 +131,8 @@ module Spree
     end
 
     # Process the invoice and adjust order state accordingly
+    # Accepts BitPay JSON invoice object
+    #
     def process_invoice(invoice)
     	logger.debug "Processing Bitpay invoice"
 

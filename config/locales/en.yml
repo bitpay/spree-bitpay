@@ -8,3 +8,7 @@ en:
       The page will automatically refresh in a few seconds when transaction is broadcast.
     bitpay_payment_method: "Instructions will be provided on the confirmation page."
     bitpay_view_invoice: "Continue to Invoice"
+    bitpay_view_full_invoice: "View invoice at BitPay.com"
+    bitpay_refresh_invoice: "Reprocess Invoice"
+    bitpay_refresh_invoice_description: "Re-poll BitPay invoice and update order status"
+    bitpay_payment_updated: "Payment Updated!"
