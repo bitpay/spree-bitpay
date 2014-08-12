@@ -11,13 +11,9 @@ var Bitpay = {
 
   finishCheckout: function(message) {
     
-    console.log("Message Received: " + JSON.stringify(message.data) + " from " + message.origin);
-
     // Limit to messages from apiEndpoint
     if (Bitpay.apiEndpoint && Bitpay.apiEndpoint.lastIndexOf(message.origin, 0) == 0) {
       
-      console.log("Message is from Bitpay");
-
       switch(message.data.status) {
         case "new":
           break;
