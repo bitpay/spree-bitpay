@@ -14,9 +14,9 @@ describe "Notifications" do
 
 
 		pending "Still need to do actual validation"
-		
 
-		binding.pry
+
+		#binding.pry
 	end
 	it "Handles 'confirmed' notification"
 	it "Handles Overpayment"
