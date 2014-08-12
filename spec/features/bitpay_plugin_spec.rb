@@ -7,7 +7,8 @@ feature "Bitpay Plugin", js: true, type: :feature do
 
 	scenario "can be configured by admin" do
 
-		admin = create(:admin_user)
+		admin = create(:admin_user, email: "test@bitpay.com")
+
 		visit admin_login_path  
 		fill_in 'Email', with: admin.email
 		fill_in 'Password', with: 'secret'
@@ -40,14 +41,15 @@ feature "Bitpay Plugin", js: true, type: :feature do
 
 	scenario "can display invoice" do
 		user = create(:user_with_addreses)
+		shipping_method = create(:free_shipping_method, name: "Satoshi Post")
+		product = create(:base_product, name: "BitPay T-Shirt")
 		visit login_path
 		fill_in 'Email', with: user.email
 		fill_in 'Password', with: 'secret'
 		click_button "Login"
 
 		expect(current_path).to eq(root_path), "User Login failed"
-
-		click_on "Ruby on Rails Tote"
+		click_on "BitPay T-Shirt"
 		click_button "Add To Cart"
 		click_button "Checkout"
 		click_button "Save and Continue" # Confirm Address
@@ -64,6 +66,9 @@ feature "Bitpay Plugin", js: true, type: :feature do
 		page.within_frame 'bitpay_invoice_iframe' do
 		  expect(page).to have_content("Pay with Bitcoin")
 		end
+
+
+		#save_and_open_screenshot
 
 	end
 

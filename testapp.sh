@@ -4,9 +4,6 @@ export RAILS_ENV=test
 
 rm -r spec/dummy
 bundle exec rake test_app
-cd spec/dummy
-bundle exec rake db:seed AUTO_ACCEPT=1
-bundle exec rake spree_sample:load
 
 # Append stylesheets/js manually until fix applied
 # https://github.com/spree/spree/issues/5157

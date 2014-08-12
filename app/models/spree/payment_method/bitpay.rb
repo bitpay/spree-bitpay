@@ -11,9 +11,17 @@ module Spree
       Spree::BitpayInvoice
     end
 
+    # Set true to force confirmation step.
+    # http://guides.spreecommerce.com/developer/checkout.html#confirmation
+    #
     def payment_profiles_supported?
-      # Set true to force confirmation step.
       true
+    end
+
+    # Dummy method to satisfy test factories
+    #
+    def create_profile(payment)
+      nil
     end
 
     def source_required?

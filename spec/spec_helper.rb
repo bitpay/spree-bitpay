@@ -17,7 +17,7 @@ require File.expand_path('../dummy/config/environment.rb',  __FILE__)
 
 require 'rspec/rails'
 require 'capybara/rspec'
-#require 'database_cleaner'
+require 'database_cleaner'
 require 'ffaker'
 require 'pry'
 
@@ -34,6 +34,11 @@ require 'spree/testing_support/url_helpers'
 
 # Requires factories defined in lib/spree_bitpay/factories.rb
 require 'spree_bitpay/factories'
+
+# Require factories under spec/factories
+Dir["#{File.dirname(__FILE__)}/factories/**"].each do |f|
+  require File.expand_path(f)
+end
 
 # Use Poltergeist driver for compatibility with Travis CI, and tell it to ignore JS errors
 require 'capybara/poltergeist'
@@ -78,11 +83,11 @@ RSpec.configure do |config|
   # to setup a test will be unavailable to the browser, which runs under a separate server instance.
   config.use_transactional_fixtures = false
 
-   # # Ensure Suite is set to use transactions for speed.
-   # config.before :suite do
-   #   DatabaseCleaner.strategy = :transaction
-   #   #DatabaseCleaner.clean_with :truncation
-   # end
+   # Ensure Suite is set to use transactions for speed.
+   config.before :suite do
+     DatabaseCleaner.strategy = :transaction
+     DatabaseCleaner.clean_with :truncation
+   end
 
    # # Before each spec check if it is a Javascript test and switch between using database transactions or not where necessary.
    # config.before :each do
