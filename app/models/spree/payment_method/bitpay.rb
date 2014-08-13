@@ -33,7 +33,7 @@ module Spree
 #######################################################################
 
     def find_invoice(id)
-      get_bitpay_client.get ('invoice/' + id)
+      id ? ( get_bitpay_client.get ('invoice/' + id) ) : nil
     end
 
     def get_bitpay_client

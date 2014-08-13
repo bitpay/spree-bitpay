@@ -11,4 +11,5 @@ en:
     bitpay_view_full_invoice: "View invoice at BitPay.com"
     bitpay_refresh_invoice: "Reprocess Invoice"
     bitpay_refresh_invoice_description: "Re-poll BitPay invoice and update order status"
-    bitpay_payment_updated: "Payment Updated!"
+    bitpay_payment_updated: "Payment status changed to: "
+    bitpay_payment_not_updated: "No status change detected."

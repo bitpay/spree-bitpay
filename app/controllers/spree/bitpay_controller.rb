@@ -11,8 +11,14 @@ module Spree
 		return redirect_to root_url if order.state != "confirm"
 
 		# Find the payment by searching for valid payments associated with the order
-		# TODO: If there is more than 1, raise exception (can handle this corner case later)
-		payment = order.payments.valid.first
+		# VOID payments are considered valid, so need to exclude those too
+		payments = order.payments.where.not(state: %w(failed invalid void))
+
+		if payments.count > 1  # If there are other completed payments use the one in checkout state
+			payment = payments.where(state: "checkout").first
+		else 
+			payment = payments.first
+		end
 
 		logger.debug "Found payment: #{payment.inspect}"
 
@@ -74,7 +80,6 @@ module Spree
 
 		# TODO:  Should this validate message origin somehow?  Compare to prefs from PaymentMethod?
 		# Should not be fatal because we are re-validating all data provided		
-
 		posData = JSON.parse(params["posData"])
 
 		order_id = posData["orderID"]
@@ -96,9 +101,13 @@ module Spree
 	#
 	def refresh
 		payment = Spree::Payment.find(params[:payment])  # Retrieve payment by ID
+		old_state = payment.state
 		invoice = payment.source.find_invoice  # Get associated invoice
 		process_invoice(invoice)	# Re-process invoice
-		redirect_to request.referrer, notice: Spree.t(:bitpay_payment_updated)
+		new_state = payment.state
+
+		notice = (new_state == old_state) ? Spree.t(:bitpay_payment_not_updated) : (Spree.t(:bitpay_payment_updated) + payment.state.titlecase)
+		redirect_to request.referrer, notice: notice
 	end
 
 #######################################################################
