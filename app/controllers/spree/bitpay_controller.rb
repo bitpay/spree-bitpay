@@ -49,13 +49,11 @@ module Spree
 
 		order = current_order || raise(ActiveRecord::RecordNotFound)
 
-		# Find payment in processing state
-		# TODO: is there a better way to look for this 
+		# Find and invalidate Bitpay payment in processing state
 		order.payments.with_state("processing").each do |payment| 
-			logger.debug "in payment"
 			if (payment.payment_method.is_a? Spree::PaymentMethod::Bitpay)
-				logger.debug "cancelling bp"
-				payment.failure!				
+				payment.state = "invalid"  # Have to set this explicitly since Spree state machine prevents it
+				payment.save!
 			end
 		end
 
@@ -74,27 +72,34 @@ module Spree
 
 	end
 
-	# Handle IPN from Bitpay server
+	## Handle IPN from Bitpay server
+	# Receives incoming IPN message and retrieves official BitPay invoice for processing
 	#
 	def notification
-
-		# TODO:  Should this validate message origin somehow?  Compare to prefs from PaymentMethod?
-		# Should not be fatal because we are re-validating all data provided		
+	
 		posData = JSON.parse(params["posData"])
 
 		order_id = posData["orderID"]
 		payment_id = posData["paymentID"]
 
-		# Get OFFICIAL Invoice from BitPay API
-		# Fetching payment this way should prevent any false payment/order mismatch
-		order = Spree::Order.find_by_number(order_id)
-		payment = order.payments.find_by(identifier: payment_id) || raise(ActiveRecord::RecordNotFound)
+		if (order_id && payment_id)
+			# Get OFFICIAL Invoice from BitPay API
+			# Fetching payment this way should prevent any false payment/order mismatch
+			order = Spree::Order.find_by_number(order_id)
+			payment = order.payments.find_by(identifier: payment_id) || raise(ActiveRecord::RecordNotFound)
 
-		invoice = payment.source.find_invoice
-		logger.debug("Bitpay Invoice Content: " + invoice.to_json)
-		process_invoice(invoice)
+			invoice = payment.source.find_invoice
 
-		render text: "", status: 200
+			if invoice
+				logger.debug("Bitpay Invoice Content: " + invoice.to_json)
+				process_invoice(invoice)
+				render status: :ok
+			else
+				render status: :not_found
+			end
+		else
+			render status: :unprocessable_entity
+		end
 	end
 
 	# Reprocess Invoice and update order status 
@@ -148,9 +153,6 @@ module Spree
 		# Extract posData
 		posData = JSON.parse(invoice["posData"])
 
-		# TODO: Handle nils here
-		order_number = invoice["orderID"]
-		invoice_id = invoice["id"]
 		payment_id = posData["paymentID"]
 		status = invoice["status"]
 		exception_status = invoice["exceptionStatus"]
@@ -158,6 +160,9 @@ module Spree
 		payment = Spree::Payment.find_by(identifier: payment_id) || raise(ActiveRecord::RecordNotFound)
 
 		logger.debug "Found Payment: #{payment.inspect}"
+
+		# Advance Payment state according to Spree flow
+		# http://guides.spreecommerce.com/user/payment_states.html
 
 		case status
 			when "new"
@@ -168,8 +173,9 @@ module Spree
 				payment.complete
 			when "expired"
 				# Abandoned invoices should be transitioned to "invalid" state
-				if (exception_status == "false")
-					payment.void!
+				if (exception_status == false)
+					payment.state = "invalid"  # Have to set this explicitly since Spree state machine prevents it
+					payment.save!
 				else
 					unless payment.state == 'failed'
 						payment.failure!
@@ -177,9 +183,9 @@ module Spree
 				end
 			when "invalid"
 				unless payment.state == 'failed' 
-					payment.failure!
+					payment.failure!  # Will be flagged risky automatically
 				end
-				# TODO: Flag as "risky" if possible
+
 			else
 				logger.debug "Unexpected status '#{invoice["status"]}'"
 		end
@@ -190,7 +196,7 @@ module Spree
 			payment.order.next
 
 			if (!payment.order.complete?)
-				logger.debug "TODO: Error handling if order can't be transitioned"	
+				raise "Can't transition order to COMPLETE state"	
 			end
 		end
 

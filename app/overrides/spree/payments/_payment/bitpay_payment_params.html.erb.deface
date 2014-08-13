@@ -1,11 +1,8 @@
 <!-- insert_after 'erb[loud]:contains("payment_method")' -->
 
-<% if (payment.payment_method.is_a? Spree::PaymentMethod::Bitpay) %>
-	<%= image_tag("BC_nBG_64px.png") %>
-<% end %>
-
-<% if (payment.payment_method.is_a? Spree::PaymentMethod::Bitpay) && (payment.state == 'checkout') %>
+<% if (payment.payment_method.is_a? Spree::PaymentMethod::Bitpay) && (payment.state != 'void') %>
 	<% pm = payment.payment_method %>
+	<%= image_tag("BC_nBG_64px.png") %>
 	<script type="text/javascript">
 		$(document).ready(function() {
 			$('[data-hook="buttons"] input[name="commit"]').click(Bitpay.checkout);
@@ -37,6 +34,7 @@
 			<div id="bitpay_checkout_guidance">
 				<span id="instructions"><%= simple_format Spree.t(:bitpay_payment_instructions) %></span>
 				<span id="completed" style="display:none"><%= Spree.t(:bitpay_payment_completed) %></span>
+				<span id="expired" style="display:none"><%= Spree.t(:bitpay_invoice_expired) %></span>
 				</br>
 			</div>
 			<div id="bitpay_payment_buttons" class="form-buttons">

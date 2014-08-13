@@ -1,7 +1,5 @@
 module Spree
 
- #TODO: Refactor to BitpayPayment?
-
   class BitpayInvoice < ActiveRecord::Base
     belongs_to :payment_method
     belongs_to :user

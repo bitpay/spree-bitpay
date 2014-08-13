@@ -21,7 +21,7 @@ var Bitpay = {
           Bitpay.continueToConfirmation();
           break;
         case "expired":
-          // TODO: Invoice refresh logic here
+          Bitpay.showExpiredMessage();
           break;
         default:
           console.log("Unexpected message type.")
@@ -38,6 +38,11 @@ var Bitpay = {
     $('#choose_another_method').attr("disabled", "disabled");
     $('#instructions').hide();
     $('#completed').show();
+  },
+
+  showExpiredMessage: function() {
+    $('#instructions').hide();
+    $('#expired').show();
   }
 
 }
