@@ -1,10 +1,11 @@
 <!-- insert_after 'erb[loud]:contains("payment_method")' -->
 
 <% if (payment.payment_method.is_a? Spree::PaymentMethod::Bitpay) %>
-	<% pm = payment.payment_method %>
-	<br/>
 	<%= image_tag("BC_nBG_64px.png") %>
+<% end %>
 
+<% if (payment.payment_method.is_a? Spree::PaymentMethod::Bitpay) && (payment.state == 'checkout') %>
+	<% pm = payment.payment_method %>
 	<script type="text/javascript">
 		$(document).ready(function() {
 			$('[data-hook="buttons"] input[name="commit"]').click(Bitpay.checkout);
