@@ -93,12 +93,12 @@ module Spree
 			if invoice
 				logger.debug("Bitpay Invoice Content: " + invoice.to_json)
 				process_invoice(invoice)
-				render status: :ok
+				head :ok
 			else
-				render status: :not_found
+				head :not_found
 			end
 		else
-			render status: :unprocessable_entity
+			head :unprocessable_entity
 		end
 	end
 
