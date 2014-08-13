@@ -38,33 +38,30 @@ Once you click the "Create" button there will be two additional parameters that 
 
 Once installed and configured, users will be able to select Bitcoin on the Payment step of the Checkout process.
 
-[photo here - btc checkout option]
+![BTC Invoice](http://heisler3030.github.io/PaymentType.png)
 
 After confirming their order details, users are presented with a modal Bitcoin invoice for payment.  
 
-[photo here - invoice]
+![BTC Invoice](http://heisler3030.github.io/BTCInvoice.png)
 
 When the payment is detected on the Bitcoin network, the modal will update and allow them to continue to the confirmation page.  
 
-[photo here - confirmed]
+![BTC Invoice Confirmed](http://heisler3030.github.io/BTCInvoiceConfirmed.png)
 
 ## Backend Processing
 
 When a user selects Bitcoin as a payment method, a new `Payment` is created, in `checkout` state, along with a new `BitpayInvoice`, which links to the invoiceID created at BitPay.com.
 
-In the event Bitcoin checkout is abandoned, the `Payment` is invalidated.  If the invoice is expired the payment is marked void.
+In the event Bitcoin checkout is abandoned or the invoice expires, the `Payment` is marked `invalid`.
 
 When a payment is detected on the Bitcoin network, the `Payment` is marked `pending`, and the `Order` is set `complete`.  The user is presented with a confirmation screen.
 
-[photo here - backend order status]
-
-When the Bitcoin transaction is fully confirmed according to your BitPay transaction speed settings [link here], a callback is delivered to the `bitpay_notification_url`, and verified with the BitPay server.  At this stage the payment will be marked Complete, and the fullfillment can proceed.
-
-[photo here - confirmed]
+When the Bitcoin transaction is fully confirmed according to your BitPay [transaction speed settings](https://bitpay.com/order-settings), a callback is delivered to the `bitpay_notification_url`, and verified with the BitPay server.  At this stage the payment will be marked `complete`, and the fullfillment can proceed.
 
 At any point, the details and current status of a BitPay payment can be viewed by clicking on the payment in the order detail screen 
 
-[photo here - payment detail]
+![BTC Invoice Confirmed](http://heisler3030.github.io/InvoiceDetails.png)
+
 
 ## Plugin Testing
 
@@ -73,3 +70,9 @@ The BitPay Spree connector uses RSpec, Capybara, and Poltergeist to perform inte
     bundle install
     ./testapp.sh
     rake
+
+## Support
+
+Questions?  Comments?  Suggestions?
+
+Contact us at support@bitpay.com
