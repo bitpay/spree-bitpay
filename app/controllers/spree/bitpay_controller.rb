@@ -109,9 +109,9 @@ module Spree
 		old_state = payment.state
 		invoice = payment.source.find_invoice  # Get associated invoice
 		process_invoice(invoice)	# Re-process invoice
-		new_state = payment.state
-
-		notice = (new_state == old_state) ? Spree.t(:bitpay_payment_not_updated) : (Spree.t(:bitpay_payment_updated) + payment.state.titlecase)
+		updated_payment = Spree::Payment.find(params[:payment])
+		new_state = updated_payment.state
+		notice = (new_state == old_state) ? Spree.t(:bitpay_payment_not_updated) : (Spree.t(:bitpay_payment_updated) + new_state.titlecase)
 		redirect_to request.referrer, notice: notice
 	end
 
