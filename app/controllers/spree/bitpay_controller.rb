@@ -87,7 +87,6 @@ module Spree
 			# Fetching payment this way should prevent any false payment/order mismatch
 			order = Spree::Order.find_by_number(order_id)
 			payment = order.payments.find_by(identifier: payment_id) || raise(ActiveRecord::RecordNotFound)
-
 			invoice = payment.source.find_invoice
 
 			if invoice
@@ -109,8 +108,7 @@ module Spree
 		old_state = payment.state
 		invoice = payment.source.find_invoice  # Get associated invoice
 		process_invoice(invoice)	# Re-process invoice
-		updated_payment = Spree::Payment.find(params[:payment])
-		new_state = updated_payment.state
+		new_state = payment.reload.state
 		notice = (new_state == old_state) ? Spree.t(:bitpay_payment_not_updated) : (Spree.t(:bitpay_payment_updated) + new_state.titlecase)
 		redirect_to request.referrer, notice: notice
 	end
