@@ -17,6 +17,7 @@ require File.expand_path('../dummy/config/environment.rb',  __FILE__)
 
 require 'rspec/rails'
 require 'capybara/rspec'
+require 'webmock/rspec'
 require 'database_cleaner'
 require 'ffaker'
 require 'pry'
@@ -45,7 +46,6 @@ require 'capybara/poltergeist'
 Capybara.register_driver :poltergeist do |app|
   Capybara::Poltergeist::Driver.new(app, :js_errors => false)
 end
-
 Capybara.javascript_driver = :poltergeist
 
 RSpec.configure do |config|
@@ -89,11 +89,17 @@ RSpec.configure do |config|
      DatabaseCleaner.clean_with :truncation
    end
 
-   # # Before each spec check if it is a Javascript test and switch between using database transactions or not where necessary.
-   # config.before :each do
-   #   DatabaseCleaner.strategy = example.metadata[:js] ? :truncation : :transaction
-   #   DatabaseCleaner.start
-   # end
+  config.before :each do
+    # Disable Webmock restrictions for feature tests.
+    if example.metadata[:type] == :feature
+      WebMock.allow_net_connect!
+    else
+      WebMock.disable_net_connect!
+    end
+
+    #DatabaseCleaner.strategy = example.metadata[:js] ? :truncation : :transaction
+    #DatabaseCleaner.start
+  end
 
    # # After each spec clean the database.
    # config.after :each do
@@ -111,4 +117,14 @@ RSpec.configure do |config|
   config.fail_fast = true
   #config.fail_fast = ENV['FAIL_FAST'] || false
   #config.order = "random"
+end
+
+####
+# Helper Methods
+###
+
+## Gets the fixture by name
+#
+def get_fixture(name)
+  JSON.parse(File.read(File.expand_path("../fixtures/#{name}",  __FILE__)))
 end
