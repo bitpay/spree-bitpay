@@ -95,6 +95,7 @@ RSpec.configure do |config|
       WebMock.allow_net_connect!
     else
       WebMock.disable_net_connect!
+      DatabaseCleaner.clean_with :truncation
     end
 
     #DatabaseCleaner.strategy = example.metadata[:js] ? :truncation : :transaction
