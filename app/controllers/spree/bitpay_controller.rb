@@ -84,7 +84,7 @@ module Spree
 
 		# Get OFFICIAL Invoice from BitPay API
 		# Fetching payment this way should prevent any false payment/order mismatch
-		order = Spree::Order.find_by_number(order_id)
+		order = Spree::Order.find_by_number(order_id) || raise(ActiveRecord::RecordNotFound)
 		payment = order.payments.find_by(identifier: payment_id) || raise(ActiveRecord::RecordNotFound)
 		invoice = payment.source.find_invoice
 
@@ -93,8 +93,7 @@ module Spree
 			process_invoice(invoice)
 			head :ok
 		else
-			logger.error "Spree_Bitpay:  No invoice found for notification for #{payment.identifier} from #{request.remote_ip}"
-			head :not_found
+			raise "Spree_Bitpay:  No invoice found for notification for #{payment.identifier} from #{request.remote_ip}"
 		end
 
 	rescue

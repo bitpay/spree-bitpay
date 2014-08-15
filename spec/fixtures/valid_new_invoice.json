@@ -1,0 +1,15 @@
+{
+  "id": "123BitPayInvoiceID",
+  "url": "https://localhost:8088/invoice?id=123BitPayInvoiceID",
+  "posData": "{\"paymentID\":\"123PAYMENTID\",\"orderID\":\"123ORDERID\"}",
+  "status": "new",
+  "btcPrice": "0.0720",
+  "price": 38.58,
+  "currency": "USD",
+  "invoiceTime": 1407988706154,
+  "expirationTime": 1407989606154,
+  "currentTime": 1407988785613,
+  "btcPaid": "0.0720",
+  "rate": 536.19,
+  "exceptionStatus": false
+}
