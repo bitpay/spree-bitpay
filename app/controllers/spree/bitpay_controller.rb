@@ -76,29 +76,30 @@ module Spree
 	# Receives incoming IPN message and retrieves official BitPay invoice for processing
 	#
 	def notification
-	
+		
 		posData = JSON.parse(params["posData"])
 
 		order_id = posData["orderID"]
 		payment_id = posData["paymentID"]
 
-		if (order_id && payment_id)
-			# Get OFFICIAL Invoice from BitPay API
-			# Fetching payment this way should prevent any false payment/order mismatch
-			order = Spree::Order.find_by_number(order_id)
-			payment = order.payments.find_by(identifier: payment_id) || raise(ActiveRecord::RecordNotFound)
-			invoice = payment.source.find_invoice
+		# Get OFFICIAL Invoice from BitPay API
+		# Fetching payment this way should prevent any false payment/order mismatch
+		order = Spree::Order.find_by_number(order_id)
+		payment = order.payments.find_by(identifier: payment_id) || raise(ActiveRecord::RecordNotFound)
+		invoice = payment.source.find_invoice
 
-			if invoice
-				logger.debug("Bitpay Invoice Content: " + invoice.to_json)
-				process_invoice(invoice)
-				head :ok
-			else
-				head :not_found
-			end
+		if invoice
+			logger.debug("Bitpay Invoice Content: " + invoice.to_json)
+			process_invoice(invoice)
+			head :ok
 		else
-			head :unprocessable_entity
+			logger.error "Spree_Bitpay:  No invoice found for notification for #{payment.identifier} from #{request.remote_ip}"
+			head :not_found
 		end
+
+	rescue
+		logger.error "Spree_Bitpay:  Unprocessable notification received from #{request.remote_ip}: #{params.inspect}"
+		head :unprocessable_entity	
 	end
 
 	# Reprocess Invoice and update order status 
@@ -110,7 +111,7 @@ module Spree
 		process_invoice(invoice)	# Re-process invoice
 		new_state = payment.reload.state
 		notice = (new_state == old_state) ? Spree.t(:bitpay_payment_not_updated) : (Spree.t(:bitpay_payment_updated) + new_state.titlecase)
-		redirect_to request.referrer, notice: notice
+		redirect_to (request.referrer || root_path), notice: notice
 	end
 
 #######################################################################
@@ -164,42 +165,76 @@ module Spree
 
 		case status
 			when "new"
+
 				payment.started_processing
+
 			when "paid" 
-				payment.pend
+				
+				# Move payment to pending state and complete order 	
+
+				if payment.state = "processing" # This is the most common scenario
+					payment.pend!
+				else # In the case it was previously marked invalid due to invoice expiry
+					payment.state = "pending"
+					payment.save
+				end
+
+				payment.order.update!
+				payment.order.next
+				if (!payment.order.complete?)
+					raise "Can't transition order #{payment.order.number} to COMPLETE state"	
+				end
+
 			when "confirmed", "complete"
-				payment.complete
+
+				# Move payment to 'complete' state
+
+				case payment.state
+				when "pending" # This is the most common scenario
+					payment.complete
+				when "completed" 
+					# Do nothing
+				else 
+					# Something unusual happened - maybe a notification was missed, or 
+					# Make sure the order is completed
+					if !payment.order.complete? 
+						payment.state = "pending"
+						payment.save
+						payment.order.next
+						if (!payment.order.complete?)
+							raise "Can't transition order #{payment.order.number} to COMPLETE state"	
+						end
+					end
+					payment.state = "completed"  # Can't use Spree payment.complete! method since we are transitioning from weird states
+					payment.save
+				end
+
 			when "expired"
-				# Abandoned invoices should be transitioned to "invalid" state
-				if (exception_status == false)
+
+				if (exception_status == false)  # This is an abandoned invoice
 					payment.state = "invalid"  # Have to set this explicitly since Spree state machine prevents it
 					payment.save!
-				else
-					unless payment.state == 'failed'
-						payment.failure!
+				else 
+					# Don't think this will be anything other than paidPartial exceptionStatus
+					unless payment.state == 'void'
+						payment.void!
 					end
 				end
+
 			when "invalid"
+				
 				unless payment.state == 'failed' 
 					payment.failure!  # Will be flagged risky automatically
 				end
 
 			else
-				logger.debug "Unexpected status '#{invoice["status"]}'"
+
+				raise "Unexpected status received from BitPay: '#{invoice["status"]}' for '#{invoice["url"]}"
+
 		end
 
-		payment.order.update!
-
-		if (payment.state == 'pending')
-			payment.order.next
-
-			if (!payment.order.complete?)
-				raise "Can't transition order to COMPLETE state"	
-			end
-		end
-
-		logger.debug "New Payment State: #{payment.state}"
-		logger.debug "New Order State: #{payment.order.state}"
+		logger.debug "New Payment State for #{payment.identifier}: #{payment.state}"
+		logger.debug "New Order State for #{payment.order.number}: #{payment.order.state}"
 
     end
 
