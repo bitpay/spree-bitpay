@@ -67,6 +67,7 @@ At any point, the details and current status of a BitPay payment can be viewed b
 
 The BitPay Spree connector uses RSpec, Capybara, and Poltergeist to perform integration testing.  To set up and run the tests, you must install PhantomJS, as described [here](https://github.com/teampoltergeist/poltergeist#installing-phantomjs).  Then execute the following steps:
 
+    export BITPAYKEY=<yourapikeyhere>
     bundle install
     ./testapp.sh
     rake

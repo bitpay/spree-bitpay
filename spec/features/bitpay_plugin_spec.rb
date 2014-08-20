@@ -30,7 +30,7 @@ feature "Bitpay Plugin", js: true, type: :feature do
 		# expect(page).to have_selector('#payment_method_bitpay_preferred_api_endpoint[value="https://bitpay.com/api"]')
 		
 		fill_in "payment_method_bitpay_preferred_api_endpoint", with: "https://test.bitpay.com/api"
-		fill_in "payment_method_bitpay_preferred_api_key", with: "rOlmMQm5WmN8E21fvyCpt66iKeQ4aMZJU02sfTCo6M"
+		fill_in "payment_method_bitpay_preferred_api_key", with: ENV['BITPAYKEY']
 		select "Test", from: "gtwy-env"
 
 		click_on "Update"				
