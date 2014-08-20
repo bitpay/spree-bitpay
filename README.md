@@ -1,5 +1,5 @@
 # BitPay plugin for Spree Commerce
-[![Build Status](https://travis-ci.org/heisler3030/spree_bitpay.svg)](https://travis-ci.org/heisler3030/spree_bitpay)
+[![Build Status](https://travis-ci.org/bitpay/spree_bitpay.svg?branch=master)](https://travis-ci.org/bitpay/spree_bitpay)
 
 BitPay Payments connector for SpreeCommerce RoR storefront.  Accept bitcoin payments with ZERO fees.  Choose remittance in your local currency or take a percentage in BTC.  
 
