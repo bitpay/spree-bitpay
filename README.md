@@ -24,7 +24,7 @@ Then run
 
     $ rails generate spree_bitpay:install
 
-The BitPay Spree connector receives RESTful confirmation callbacks at the `bitpay_notification_url` (typically http://<host>/spree_bitpay/notification).  This route must be available to receive messages from https://bitpay.com for proper operation.  The connector has been implemented to verify any callbacks received at this route, to prevent malicious transactions.
+The BitPay Spree connector receives RESTful confirmation callbacks at the `bitpay_notification_url` (typically `http://<host>/spree_bitpay/notification`).  **This route must be available to receive messages from https://bitpay.com for proper operation**.  This may require changes to your network configuration if your server is behind a firewall.  The connector has been implemented to verify any callbacks received at this route, to prevent fraudulent/spoof messages.
 
 ## Application Configuration
 
