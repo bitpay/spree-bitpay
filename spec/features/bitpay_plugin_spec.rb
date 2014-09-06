@@ -39,7 +39,7 @@ feature "Bitpay Plugin", js: true, type: :feature do
 
 	end	
 
-	scenario "can display invoice" do
+	xscenario "can display invoice" do
 		user = create(:user_with_addreses)
 		shipping_method = create(:free_shipping_method, name: "Satoshi Post")
 		product = create(:base_product, name: "BitPay T-Shirt")
