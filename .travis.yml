@@ -20,5 +20,5 @@ notifications:
     on_failure: change
     on_success: never
 env:
-  matrix:
-    secure: Bpe13wRbj4RrfqrROu6HHWL58DpRlumZqUm22gMK1RHomkuZ5W5sc9Q6MEITt+MihbagmhmbNu7vztU+xdr1m+OlNaibvJeWKZEOyvvRKodUofCBBG677khzsJ2VxQeaboE7BfsPxIL0XaEkGQiVSU0lfdMi62D04Xbb6SxIWoA=
+  global:
+    secure: rK79pr+jpARJRPG79WD76v1GMWUm6XnTMr4dUWJk6QgFHB1AMYc3UURccWvlPmVKG3iSJ1rd4SWoajNosYXbL1CMP6LvNNCIeOa+QoLxBu2npXP5fUIt7HmD4b17mcT9sShjU8YValwbHGhfUnEmpP5AGjQSF21dsDDOANWlRKA=
