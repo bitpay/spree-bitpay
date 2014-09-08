@@ -1,5 +1,5 @@
 # BitPay plugin for Spree Commerce
-[![Build Status](https://travis-ci.org/bitpay/spree_bitpay.svg?branch=master)](https://travis-ci.org/bitpay/spree_bitpay)
+[![Build Status](https://travis-ci.org/bitpay/spree-bitpay.svg?branch=master)](https://travis-ci.org/bitpay/spree_bitpay)
 
 BitPay Payments connector for SpreeCommerce RoR storefront.  Accept bitcoin payments with ZERO fees.  Choose remittance in your local currency or take a percentage in BTC.  
 
@@ -10,7 +10,7 @@ For development and testing against the bitcoin testnet, sign up at https://test
 
 Add this line to your application's Gemfile:
 
-    gem 'spree_bitpay'
+    gem 'spree-bitpay'
 
 And then execute:
 
@@ -18,11 +18,11 @@ And then execute:
 
 Or install it yourself as:
 
-    $ gem install spree_bitpay
+    $ gem install spree-bitpay
 
 Then run 
 
-    $ rails generate spree_bitpay:install
+    $ rails generate spree-bitpay:install
 
 The BitPay Spree connector receives RESTful confirmation callbacks at the `bitpay_notification_url` (typically `http://<host>/spree_bitpay/notification`).  **This route must be available to receive messages from https://bitpay.com for proper operation**.  This may require changes to your network configuration if your server is behind a firewall.  The connector has been implemented to verify any callbacks received at this route, to prevent fraudulent/spoof messages.
 
@@ -67,7 +67,7 @@ At any point, the details and current status of a BitPay payment can be viewed b
 
 The BitPay Spree connector uses RSpec, Capybara, and Poltergeist to perform integration testing.  To set up and run the tests, you must install PhantomJS, as described [here](https://github.com/teampoltergeist/poltergeist#installing-phantomjs).  Then execute the following steps:
 
-    export BITPAYKEY=<yourapikeyhere>
+    export BITPAYKEY=<your test.bitpay.com api key here>
     bundle install
     ./testapp.sh
     rake
