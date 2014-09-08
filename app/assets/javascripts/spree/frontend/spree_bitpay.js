@@ -17,14 +17,14 @@ var Bitpay = {
       switch(message.data.status) {
         case "new":
           break;
-        case "paid":
+        case "paid", "confirmed":
           Bitpay.continueToConfirmation();
           break;
         case "expired":
           Bitpay.showExpiredMessage();
           break;
         default:
-          console.log("Unexpected message type.")
+          console.log("Unexpected message type: " + message.data.status)
       }
     }
     return false;
