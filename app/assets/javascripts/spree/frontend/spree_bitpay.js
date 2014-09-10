@@ -17,7 +17,8 @@ var Bitpay = {
       switch(message.data.status) {
         case "new":
           break;
-        case "paid", "confirmed":
+        case "paid": 
+        case "confirmed":
           Bitpay.continueToConfirmation();
           break;
         case "expired":
