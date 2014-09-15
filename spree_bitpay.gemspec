@@ -5,7 +5,7 @@ require 'spree_bitpay/version'
 
 Gem::Specification.new do |s|
   s.platform      = Gem::Platform::RUBY
-  s.name          = "spree-bitpay"
+  s.name          = "spree_bitpay"
   s.version       = SpreeBitpay::VERSION
   s.authors       = 'BitPay, Inc.'
   s.email         = 'info@bitpay.com'
