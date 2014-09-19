@@ -1,19 +1,42 @@
 // BitPay Payment Methods
+//= require spree/frontend
+
 var Bitpay = {
 
   checkout: function(e) {
     e.preventDefault();
-    $('#bitpay_invoice_iframe').attr("src", Bitpay.invoiceUrl);
+    Bitpay.iframeUrl = $.ajax({url: Bitpay.invoiceUrl, async: false}).responseText
+    $('#bitpay_invoice_iframe').attr("src", Bitpay.iframeUrl);
     $('#bitpay_checkout_modal').trigger('openModal');
-  
+    setTimeout(Bitpay.checkForUpdates(), 5000);
     return false;
   },
 
+  checkForUpdates: function() {
+    invId = Bitpay._retrieveInvoiceIdFromURI();
+    url = Bitpay.checkUrl;
+    $.ajax({
+      url: url,
+      data: {invoice_id: invId},
+      dataType: "json",
+      complete: function(json) { Bitpay.getInvoiceState(json.responseText) }
+    });
+    return false
+  },
+
+  continueToConfirmation: function() {
+    // Backend will validate actual invoice payment
+    $('#continue_to_invoice').removeAttr("disabled");
+    $('#continue_to_invoice').attr("class", "continue button primary");
+    $('#choose_another_method').attr("class", "button disabled");
+    $('#choose_another_method').attr("disabled", "disabled");
+    $('#instructions').hide();
+    $('#completed').show();
+  },
+
   finishCheckout: function(message) {
-    
     // Limit to messages from apiEndpoint
     if (Bitpay.apiEndpoint && Bitpay.apiEndpoint.lastIndexOf(message.origin, 0) == 0) {
-      
       switch(message.data.status) {
         case "new":
           break;
@@ -31,21 +54,31 @@ var Bitpay = {
     return false;
   },
 
-  continueToConfirmation: function() {
-    // Backend will validate actual invoice payment
-    $('#continue_to_invoice').removeAttr("disabled");
-    $('#continue_to_invoice').attr("class", "continue button primary");
-    $('#choose_another_method').attr("class", "button disabled");
-    $('#choose_another_method').attr("disabled", "disabled");
-    $('#instructions').hide();
-    $('#completed').show();
+  getInvoiceState: function(invoiceState) {
+    if(invoiceState == "new"){
+      setTimeout(Bitpay.checkForUpdates(), 5000)
+    } else {
+      Bitpay.refreshCheckout();
+    }
+  },
+
+  refreshCheckout: function() {
+    $('#bitpay_invoice_iframe').attr("src", Bitpay.iframeUrl);
+    return false;
   },
 
   showExpiredMessage: function() {
     $('#instructions').hide();
     $('#expired').show();
-  }
+  },
+
+  _retrieveInvoiceIdFromURI: function() {
+    var parser = document.createElement('a');
+    parser.href = Bitpay.iframeUrl;
+    var search = parser.search;
+    Bitpay.invoiceId = search.replace(/^\?/,'').split('&')[0].split('=')[1];
+    return Bitpay.invoiceId;  
+ }
 
 }
-
 

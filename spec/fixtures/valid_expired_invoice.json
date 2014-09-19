@@ -1,0 +1,16 @@
+{ 
+  "id": "HA1CyVydbwLmB6LS35RNQE", 
+  "url": "https://paul.bp:8088/invoice?id=HA1CyVydbwLmB6LS35RNQE", 
+  "posData": "{\"paymentID\":\"EDY7PJWM\",\"orderID\":\"R337975673\"}", 
+  "status": "expired", 
+  "btcPrice": "0.0648", 
+  "price": 29.14, 
+  "currency": "USD", 
+  "invoiceTime": 1411008484489, 
+  "expirationTime": 1411009384489, 
+  "currentTime": 1411051760821, 
+  "btcPaid": "0.0000", 
+  "rate": 450, 
+  "exceptionStatus": false, 
+  "buyerFields": {} 
+}

@@ -4,5 +4,6 @@ Spree::Core::Engine.routes.draw do
   get '/spree_bitpay/payment_sent', :to => "bitpay#payment_sent", :as => :bitpay_payment_sent
   get '/spree_bitpay/cancel', :to => "bitpay#cancel", :as => :bitpay_cancel
   get '/spree_bitpay/refresh', :to => "bitpay#refresh", :as => :bitpay_refresh
+  get '/spree_bitpay/check', :to => "bitpay#check_payment_state", :as => :bitpay_check
   post '/spree_bitpay/notification', :to => "bitpay#notification", :as => :bitpay_notification
 end

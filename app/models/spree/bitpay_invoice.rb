@@ -8,15 +8,15 @@ module Spree
     # DB fields: user_id, invoice_id
 
     attr_accessor :bogus  # bogus since we need to have a param that is passed to trigger Payment.build_source
-    
+
     def actions
-    # TODO: Refund action?	
+      # TODO: Refund action?	
       ["void"]
     end
 
     # Gets the JSON invoice from Bitpay
     def find_invoice
-    	payment_method.find_invoice(invoice_id)
+      payment_method.find_invoice(invoice_id)
     end
 
   end
