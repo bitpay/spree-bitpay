@@ -11,7 +11,7 @@ Gem::Specification.new do |s|
   s.email         = 'info@bitpay.com'
   s.summary       = 'BitPay bitcoin payments plugin'
   s.homepage      = 'https://bitpay.com'
-  s.version       = '0.1.0'
+  s.version       = '0.1.1'
   s.required_ruby_version = '>= 1.9.3'
 
   s.files         = `git ls-files -z`.split("\x0")

@@ -15,6 +15,7 @@
       });
 
     Bitpay.invoiceUrl = "<%= j bitpay_pay_now_url(pmid: pm.id).html_safe %>";
+    Bitpay.checkUrl = "<%= j bitpay_check_url %>";
     Bitpay.apiEndpoint = "<%= pm.get_preference(:api_endpoint) %>";			
   })
 
