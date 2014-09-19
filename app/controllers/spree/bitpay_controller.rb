@@ -41,9 +41,15 @@ module Spree
     # View Invoice with specific ID
     #
     def view_invoice
-
       invoice = BitpayInvoice.find(params[:source_id]).find_invoice
       redirect_to (invoice["url"] + '&view=iframe')
+    end
+
+    def check_payment_state
+      invoice = BitpayInvoice.where(invoice_id: params[:invoice_id]).first
+      pm = PaymentMethod.find(invoice.payment_method_id)
+      status = pm.scan_the_server(invoice.invoice_id)
+      render json: status
     end
 
     def cancel

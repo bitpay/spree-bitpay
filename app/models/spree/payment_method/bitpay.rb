@@ -38,6 +38,16 @@ module Spree
       id ? ( get_bitpay_client.get ('invoice/' + id) ) : nil
     end
 
+      
+    def scan_the_server(id)
+      message = get_bitpay_client.get('invoice/' + id)
+      status = message["status"]
+      return status unless status.nil?
+      error = message["error"]["message"] if status.nil?
+      return error unless error.nil?
+      "unknown error"
+    end
+    
     ## Interface with BitPay 
     #
     def get_bitpay_client
