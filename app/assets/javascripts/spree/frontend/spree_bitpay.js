@@ -3,12 +3,14 @@
 
 var Bitpay = {
 
+  reasonableInterval: 2000,
+
   checkout: function(e) {
     e.preventDefault();
     Bitpay.iframeUrl = $.ajax({url: Bitpay.invoiceUrl, async: false}).responseText
     $('#bitpay_invoice_iframe').attr("src", Bitpay.iframeUrl);
     $('#bitpay_checkout_modal').trigger('openModal');
-    setTimeout(Bitpay.checkForUpdates(), 5000);
+    setTimeout(function(){ Bitpay.checkForUpdates()}, Bitpay.reasonableInterval);
     return false;
   },
 
@@ -56,7 +58,7 @@ var Bitpay = {
 
   getInvoiceState: function(invoiceState) {
     if(invoiceState == "new"){
-      setTimeout(Bitpay.checkForUpdates(), 5000)
+      var timeout = setTimeout(function(){ Bitpay.checkForUpdates() }, Bitpay.reasonableInterval);
     } else {
       Bitpay.refreshCheckout();
     }
