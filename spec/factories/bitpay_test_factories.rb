@@ -38,6 +38,10 @@ FactoryGirl.define do
       association :order, factory: :order_with_line_items, state: "confirm", number: ORDER_ID
     end    
 
+    factory :invalid_payment do
+      state 'invalid'
+    end    
+
   end
 
   factory :bitcoin_payment_method, class: Spree::PaymentMethod::Bitpay do

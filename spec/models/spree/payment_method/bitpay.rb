@@ -3,7 +3,6 @@ require 'spec_helper'
 describe Spree::PaymentMethod::Bitpay do
   describe '#scan_the_server' do
     subject = FactoryGirl.create(:bitcoin_payment_method)
-    it{ respond_to :scan_the_server }
 
     context 'when the invoice does not exist' do
       it "returns 'invoice not found'" do

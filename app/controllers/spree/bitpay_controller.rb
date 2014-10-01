@@ -12,13 +12,8 @@ module Spree
 
       # Find the payment by searching for valid payments associated with the order
       # VOID payments are considered valid, so need to exclude those too
-      payments = order.payments.where.not(state: %w(failed invalid void))
-
-      if payments.count > 1  # If there are other completed payments use the one in checkout state
-        payment = payments.where(state: "checkout").first
-      else 
-        payment = payments.first
-      end
+      
+      payment = order.get_bitpay_payment
 
       logger.debug "Found payment: #{payment.inspect}"
 
