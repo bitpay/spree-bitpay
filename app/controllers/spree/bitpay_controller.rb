@@ -96,17 +96,6 @@ module Spree
       order_id = posData["orderID"]
       payment_id = posData["paymentID"]
 
-      get_official_invoice
-
-    rescue
-      logger.error "Spree_Bitpay:  Unprocessable notification received from #{request.remote_ip}: #{params.inspect}"
-      head :unprocessable_entity
-    end
-
-    #TODO: move to model
-    def get_official_invoice
-      # Get OFFICIAL Invoice from BitPay API
-      # Fetching payment this way should prevent any false payment/order mismatch
       order = Spree::Order.find_by_number(order_id) || raise(ActiveRecord::RecordNotFound)
       payment = order.payments.find_by(identifier: payment_id) || raise(ActiveRecord::RecordNotFound)
       invoice = payment.source.find_invoice
@@ -118,6 +107,10 @@ module Spree
       else
         raise "Spree_Bitpay:  No invoice found for notification for #{payment.identifier} from #{request.remote_ip}"
       end
+
+    rescue
+      logger.error "Spree_Bitpay:  Unprocessable notification received from #{request.remote_ip}: #{params.inspect}"
+      head :unprocessable_entity
     end
 
     # Reprocess Invoice and update order status
