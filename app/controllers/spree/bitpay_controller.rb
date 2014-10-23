@@ -9,10 +9,16 @@ module Spree
       order = current_order || raise(ActiveRecord::RecordNotFound)
 
       return redirect_to root_url if order.state != "confirm"
+      locate_valid_payments
+      return_iframe_view
+    end
+
+    #TODO: move below method to model
+    def locate_valid_payments
 
       # Find the payment by searching for valid payments associated with the order
       # VOID payments are considered valid, so need to exclude those too
-      
+
       payment = order.get_bitpay_payment
 
       logger.debug "Found payment: #{payment.inspect}"
@@ -28,7 +34,10 @@ module Spree
         # An invoice was already created - find it
         invoice = payment.source.find_invoice
       end
+    end
 
+    #TODO: move to model
+    def return_iframe_view
       @invoice_iframe_url = "#{invoice['url']}&view=iframe"
       render json: @invoice_iframe_url
     end
@@ -50,17 +59,20 @@ module Spree
     def cancel
 
       order = current_order || raise(ActiveRecord::RecordNotFound)
+      invalidate_processing_payments
 
+      redirect_to edit_order_url(order, state: 'payment'), :notice => Spree.t(:checkout_cancelled)
+    end
+
+    #TODO: move to model
+    def invalidate_processing_payments
       # Find and invalidate Bitpay payment in processing state
-      order.payments.with_state("processing").each do |payment| 
+      order.payments.with_state("processing").each do |payment|
         if (payment.payment_method.is_a? Spree::PaymentMethod::Bitpay)
           payment.state = "invalid"  # Have to set this explicitly since Spree state machine prevents it
           payment.save!
         end
       end
-
-      redirect_to edit_order_url(order, state: 'payment'), :notice => Spree.t(:checkout_cancelled)
-
     end
 
     # Fires on receipt of payment received window message
@@ -84,8 +96,6 @@ module Spree
       order_id = posData["orderID"]
       payment_id = posData["paymentID"]
 
-      # Get OFFICIAL Invoice from BitPay API
-      # Fetching payment this way should prevent any false payment/order mismatch
       order = Spree::Order.find_by_number(order_id) || raise(ActiveRecord::RecordNotFound)
       payment = order.payments.find_by(identifier: payment_id) || raise(ActiveRecord::RecordNotFound)
       invoice = payment.source.find_invoice
@@ -100,10 +110,10 @@ module Spree
 
     rescue
       logger.error "Spree_Bitpay:  Unprocessable notification received from #{request.remote_ip}: #{params.inspect}"
-      head :unprocessable_entity	
+      head :unprocessable_entity
     end
 
-    # Reprocess Invoice and update order status 
+    # Reprocess Invoice and update order status
     #
     def refresh
       payment = Spree::Payment.find(params[:payment])  # Retrieve payment by ID
@@ -123,6 +133,63 @@ module Spree
 
     # Call Bitpay API and return new JSON invoice object
     #
+
+    #TODO: move to model
+    def move_to_pending_state
+      if payment.state = "processing" # This is the most common scenario
+        payment.pend!
+      else # In the case it was previously marked invalid due to invoice expiry
+        payment.state = "pending"
+        payment.save
+      end
+    end
+
+    #TODO: refactor more
+    #TODO: move to model
+    def move_payment_to_complete_state
+      case payment.state
+      when "pending" # This is the most common scenario
+        payment.complete
+      when "completed"
+        # Do nothing
+      else
+        # Something unusual happened - maybe a notification was missed, or
+        # Make sure the order is completed
+        if !payment.order.complete?
+          payment.state = "pending"
+          payment.save
+          payment.order.next
+          if (!payment.order.complete?)
+            raise "Can't transition order #{payment.order.number} to COMPLETE state"
+          end
+        end
+        payment.state = "completed"  # Can't use Spree payment.complete! method since we are transitioning from weird states
+        payment.save
+      end
+    end
+
+    #TODO: move to model
+    def update_order_payment_status
+      payment.order.update!
+      payment.order.next
+      if (!payment.order.complete?)
+        raise "Can't transition order #{payment.order.number} to COMPLETE state"
+      end
+    end
+
+    def check_invoice_exception_status
+      if (exception_status == false)  # This is an abandoned invoice
+        payment.state = "invalid"  # Have to set this explicitly since Spree state machine prevents it
+        payment.save!
+      else
+        # Don't think this will be anything other than paidPartial exceptionStatus
+        unless payment.state == 'void'
+          payment.void!
+        end
+      end
+    end
+
+
     def new_invoice(order, payment)
 
       # Have to encode this into a string for proper handling by API
@@ -144,6 +211,7 @@ module Spree
       return invoice
     end
 
+    #TODO: REFACTOR!!!!!
     # Process the invoice and adjust order state accordingly
     # Accepts BitPay JSON invoice object
     #
@@ -161,70 +229,33 @@ module Spree
 
       logger.debug "Found Payment: #{payment.inspect}"
 
+      evaluate_payment_status
+
+      logger.debug "New Payment State for #{payment.identifier}: #{payment.state}"
+      logger.debug "New Order State for #{payment.order.number}: #{payment.order.state}"
+    end
+
+    #TODO: move to model
+    def evaluate_payment_status
       # Advance Payment state according to Spree flow
       # http://guides.spreecommerce.com/user/payment_states.html
-
       case status
       when "new"
-
         payment.started_processing
-
-      when "paid" 
-
-        # Move payment to pending state and complete order 	
-
-        if payment.state = "processing" # This is the most common scenario
-          payment.pend!
-        else # In the case it was previously marked invalid due to invoice expiry
-          payment.state = "pending"
-          payment.save
-        end
-
-        payment.order.update!
-        payment.order.next
-        if (!payment.order.complete?)
-          raise "Can't transition order #{payment.order.number} to COMPLETE state"	
-        end
+      when "paid"
+        # Move payment to pending state and complete order
+        move_to_pending_state
+        update_order_payment_status
 
       when "confirmed", "complete"
-
-        # Move payment to 'complete' state
-
-        case payment.state
-        when "pending" # This is the most common scenario
-          payment.complete
-        when "completed" 
-          # Do nothing
-        else 
-          # Something unusual happened - maybe a notification was missed, or 
-          # Make sure the order is completed
-          if !payment.order.complete? 
-            payment.state = "pending"
-            payment.save
-            payment.order.next
-            if (!payment.order.complete?)
-              raise "Can't transition order #{payment.order.number} to COMPLETE state"	
-            end
-          end
-          payment.state = "completed"  # Can't use Spree payment.complete! method since we are transitioning from weird states
-          payment.save
-        end
+        move_payment_to_complete_state
 
       when "expired"
-
-        if (exception_status == false)  # This is an abandoned invoice
-          payment.state = "invalid"  # Have to set this explicitly since Spree state machine prevents it
-          payment.save!
-        else 
-          # Don't think this will be anything other than paidPartial exceptionStatus
-          unless payment.state == 'void'
-            payment.void!
-          end
-        end
+        check_invoice_exception_status
 
       when "invalid"
 
-        unless payment.state == 'failed' 
+        unless payment.state == 'failed'
           payment.failure!  # Will be flagged risky automatically
         end
 
@@ -233,10 +264,6 @@ module Spree
         raise "Unexpected status received from BitPay: '#{invoice["status"]}' for '#{invoice["url"]}"
 
       end
-
-      logger.debug "New Payment State for #{payment.identifier}: #{payment.state}"
-      logger.debug "New Order State for #{payment.order.number}: #{payment.order.state}"
-
     end
 
   end
