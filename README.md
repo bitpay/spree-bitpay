@@ -1,7 +1,7 @@
 # BitPay plugin for Spree Commerce
 [![Build Status](https://travis-ci.org/bitpay/spree-bitpay.svg?branch=master)](https://travis-ci.org/bitpay/spree_bitpay)
 
-BitPay Payments connector for SpreeCommerce RoR storefront.  Accept bitcoin payments with ZERO fees.  Choose remittance in your local currency or take a percentage in BTC.  
+BitPay Payments connector for SpreeCommerce 2.2.x RoR storefront.  Accept bitcoin payments with ZERO fees.  Choose remittance in your local currency or take a percentage in BTC.  
 
 Sign up for your account at https://bitpay.com.  
 For development and testing against the bitcoin testnet, sign up at https://test.bitpay.com.
@@ -10,19 +10,15 @@ For development and testing against the bitcoin testnet, sign up at https://test
 
 Add this line to your application's Gemfile:
 
-    gem 'spree-bitpay'
+    gem 'spree_bitpay', :git => 'https://github.com/bitpay/spree-bitpay.git'
 
 And then execute:
 
-    $ bundle
-
-Or install it yourself as:
-
-    $ gem install spree-bitpay
+    $ bundle install
 
 Then run 
 
-    $ rails generate spree-bitpay:install
+    $ rails generate spree_bitpay:install
 
 The BitPay Spree connector receives RESTful confirmation callbacks at the `bitpay_notification_url` (typically `http://<host>/spree_bitpay/notification`).  **This route must be available to receive messages from https://bitpay.com for proper operation**.  This may require changes to your network configuration if your server is behind a firewall.  The connector has been implemented to verify any callbacks received at this route, to prevent fraudulent/spoof messages.
 
