@@ -1,3 +1,17 @@
 /* 
  *= require spree/backend
 */
+
+.bitpay_invoice_details {
+	padding-top: 20px;
+	padding-bottom: 20px;
+}
+
+#bitpay_view_invoice_iframe {
+	width: 542px;
+	//height: 150px;
+	border: 1px solid #d9d9db;
+	overflow: hidden;
+	padding:20px;
+	max-width: 100%;
+}
