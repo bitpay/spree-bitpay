@@ -14,4 +14,16 @@ Spree::Order.class_eval do
     return checkout.last if checkout.any?
     return processing.last if processing.any?
   end
+
+  def find
+    current_order || raise(ActiveRecord::RecordNotFound)
+  end
+
+  def find_by_session
+    self.find(session[:order_id]) || raise(ActiveRecord::RecordNotFound)
+  end
+
+  def find_by_id
+    self.find_by_number(order_id) || raise(ActiveRecord::RecordNotFound)
+  end
 end
