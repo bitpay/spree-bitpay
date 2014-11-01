@@ -52,12 +52,6 @@ module Spree
     # Receives incoming IPN message and retrieves official BitPay invoice for processing
     #
     def notification
-
-      posData = JSON.parse(params["posData"])
-
-      order_id = posData["orderID"]
-      payment_id = posData["paymentID"]
-
       # Get OFFICIAL Invoice from BitPay API
       # Fetching payment this way should prevent any false payment/order mismatch
       order = Spree::Order.find_by_number(order_id) || raise(ActiveRecord::RecordNotFound)
@@ -95,6 +89,17 @@ module Spree
 
     private
 
+    def data
+      JSON.parse(params["posData"])
+    end
+
+    def order_id
+      data["orderID"]
+    end
+
+    def payment_id
+      data["paymentID"]
+    end
 
     # Call Bitpay API and return new JSON invoice object
     #
