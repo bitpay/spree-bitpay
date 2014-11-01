@@ -6,7 +6,7 @@ module Spree
     #
     def pay_now
 
-      @order = current_order || raise(ActiveRecord::RecordNotFound)
+      order = Order.find
 
       return redirect_to root_url if order.state != "confirm"
       find_valid_payments(@order)
@@ -30,7 +30,7 @@ module Spree
 
     def cancel
 
-      @order = current_order || raise(ActiveRecord::RecordNotFound)
+      order = Order.find
       invalidate_processing_payments
       redirect_to edit_order_url(order, state: 'payment'), :notice => Spree.t(:checkout_cancelled)
 
@@ -41,7 +41,7 @@ module Spree
     #
     def payment_sent
 
-      order = Spree::Order.find(session[:order_id]) || raise(ActiveRecord::RecordNotFound)
+      order = Order.find_by_session
 
       session[:order_id] = nil # Reset cart
       redirect_to spree.order_path(order), :notice => Spree.t(:order_processed_successfully)
@@ -94,6 +94,7 @@ module Spree
     #######################################################################
 
     private
+
 
     # Call Bitpay API and return new JSON invoice object
     #
