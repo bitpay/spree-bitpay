@@ -34,15 +34,15 @@ Once you click the "Create" button there will be two additional parameters that 
 
 Once installed and configured, users will be able to select Bitcoin on the Payment step of the Checkout process.
 
-![BTC Invoice](http://heisler3030.github.io/PaymentType.png)
+![Payment Type](https://cloud.githubusercontent.com/assets/4770544/6882661/470ce9d0-d54a-11e4-83ac-e29d8bb04310.png)
 
 After confirming their order details, users are presented with a modal Bitcoin invoice for payment.  
 
-![BTC Invoice](http://heisler3030.github.io/BTCInvoice.png)
+![BTC Invoice](https://cloud.githubusercontent.com/assets/4770544/6882659/46b90216-d54a-11e4-8a5a-94d5ff5392f6.png)
 
 When the payment is detected on the Bitcoin network, the modal will update and allow them to continue to the confirmation page.  
 
-![BTC Invoice Confirmed](http://heisler3030.github.io/BTCInvoiceConfirmed.png)
+![BTC Invoice Confirmed](https://cloud.githubusercontent.com/assets/4770544/6882658/46b8698c-d54a-11e4-9ec0-5fc83a7a97cf.png)
 
 ## Backend Processing
 
@@ -56,7 +56,7 @@ When the Bitcoin transaction is fully confirmed according to your BitPay [transa
 
 At any point, the details and current status of a BitPay payment can be viewed by clicking on the payment in the order detail screen 
 
-![BTC Invoice Confirmed](http://heisler3030.github.io/InvoiceDetails.png)
+![Invoice Details](https://cloud.githubusercontent.com/assets/4770544/6882660/470a03f0-d54a-11e4-8e2f-0cf82fd6091a.png)
 
 
 ## Plugin Testing
