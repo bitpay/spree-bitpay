@@ -1,0 +1,10 @@
+<% if @object.instance_of?(Spree::PaymentMethod::BitPay) %>
+  <div class="form-group">
+    <label>Authenticate with BitPay</label>
+    <select class="select2" name="bitcoin_network" id="bitpay_api_uri">
+    <option value="https://bitpay.com">LiveNet</option>
+    <option value="https://test.bitpay.com">TestNet</option></select>
+  </div>
+<% else %>
+  <%= preference_fields(@object, f) %>
+<% end %>

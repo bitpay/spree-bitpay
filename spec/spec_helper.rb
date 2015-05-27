@@ -12,10 +12,13 @@ end
 
 # Configure Rails Environment
 ENV['RAILS_ENV'] = 'test'
+ENV['BPSECRET'] = 'thisisaverysecretstring'
+ENV['BPSALT'] = 'ttstring'
 
 require File.expand_path('../dummy/config/environment.rb',  __FILE__)
 
 require 'rspec/rails'
+require 'rspec/active_model/mocks'
 require 'database_cleaner'
 require 'ffaker'
 
@@ -32,6 +35,7 @@ require 'spree/testing_support/url_helpers'
 
 # Requires factories defined in lib/spree_bitpay/factories.rb
 require 'spree_bitpay/factories'
+require 'bit_pay_rails'
 
 RSpec.configure do |config|
   config.include FactoryGirl::Syntax::Methods
