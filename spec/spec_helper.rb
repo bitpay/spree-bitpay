@@ -37,6 +37,9 @@ require 'spree/testing_support/url_helpers'
 require 'spree_bitpay/factories'
 require 'bit_pay_rails'
 
+require 'capybara/poltergeist'
+Capybara.javascript_driver = :poltergeist
+
 RSpec.configure do |config|
   config.include FactoryGirl::Syntax::Methods
 

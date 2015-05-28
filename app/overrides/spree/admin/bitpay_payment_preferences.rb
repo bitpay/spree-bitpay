@@ -1,5 +1,5 @@
-Deface::Override.new(virtual_path: "spree/admin/payment_methods/_form",
+Deface::Override.new(virtual_path: "spree/admin/payment_methods/edit",
                      name: "bitpay_payment_preference",
-                     replace: 'erb[loud]:contains("preference_fields")',
+                     insert_before: 'erb[loud]:contains("form_for @payment_method")',
                      partial: "spree/admin/shared/bitpay_payment_preferences"
                     )
