@@ -1,10 +1,17 @@
 <% if @object.instance_of?(Spree::PaymentMethod::BitPay) %>
-  <%= form_tag(admin_payment_method_bit_pays_index_path, {pay_id: @payment_method.id}) do |f| %>
+  <%= ENV['BPDEVSERVER'] %>
+  <%= form_tag(admin_payment_method_bit_pays_authenticate_path) do |f| %>
     <div class="form-group">
       <label>Authenticate with BitPay</label>
       <select class="select2" name="bitcoin_network" id="bitpay_api_uri">
       <option value="https://bitpay.com">LiveNet</option>
-      <option value="https://test.bitpay.com">TestNet</option></select>
+      <option value="https://test.bitpay.com">TestNet</option>
+      <% if Rails.env == "development" || Rails.env == "test" %>
+        <option value=<%= ENV['BPDEVSERVER'] %>>Development</option>
+      <% end %>
+      </select>
+      <input type="hidden" name="redirect_url" value=<%= @_request.original_url %>>
+      <input type="hidden" name="payment_method_id" value=<%= @payment_method.id %>>
       <input class="btn btn-primary" type="submit" value="Authenticate with BitPay">
     </div>
   <% end %>

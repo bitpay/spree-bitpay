@@ -40,6 +40,10 @@ require 'bit_pay_rails'
 require 'capybara/poltergeist'
 Capybara.javascript_driver = :poltergeist
 
+Capybara.register_driver :poltergeist do |app|
+  Capybara::Poltergeist::Driver.new(app, phantomjs_options: ['--ignore-ssl-errors=yes', '--local-to-remote-url-access=yes'])
+end
+
 RSpec.configure do |config|
   config.include FactoryGirl::Syntax::Methods
 

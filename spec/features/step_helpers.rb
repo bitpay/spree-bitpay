@@ -14,3 +14,11 @@ def create_new_payment_method name, type
   select type, from: "gtwy-type"
   click_on("Create")
 end
+
+def login_bitpay path, user, password
+  visit "#{path}/dashboard/login/"
+  fill_in 'email', :with => user
+  fill_in 'password', :with => password
+  click_on('Login')
+  find(".ion-gear-a", match: :first)
+end

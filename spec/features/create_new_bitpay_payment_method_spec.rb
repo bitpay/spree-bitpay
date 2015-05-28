@@ -9,12 +9,24 @@ feature "Creating a new BitPay Payment Method", js: true, type: :feature do
     expect(page).to have_selector('#bitpay_api_uri option[value="https://test.bitpay.com"]'), "No testnet dropdown"
   end
   
-  scenario "Choosing testnet redirects to testnet" do
+  scenario 'the user is logged in to bitpay' do
+    login_bitpay ENV['BPDEVSERVER'], ENV['BPUSER'], ENV['BPPASSWORD']
+    login_admin
+    old_url = current_url
+    create_new_payment_method "Bitcoin", "Spree::PaymentMethod::BitPay"
+    select("Development", from: "bitcoin_network")
+    find_button("Authenticate with BitPay").click
+    #click the approval button
+    #do something else
+  end
+
+  scenario 'the user is logged out of bitpay' do
     login_admin
     create_new_payment_method "Bitcoin", "Spree::PaymentMethod::BitPay"
-    select("TestNet", from: "bitcoin_network")
+    old_url = current_url
+    select("Development", from: "bitcoin_network")
     find_button("Authenticate with BitPay").click
-    expect(current_host).to match("test.bitpay.com")
+    expect(current_url).to match(/#{ENV['BPDEVSERVER']}\/api-access-request\?pairingCode=[a-zA-Z0-9]{7}&redirect=#{old_url}/)
   end
   
   scenario "The form is exclusive to BitPay PaymentMethod" do
