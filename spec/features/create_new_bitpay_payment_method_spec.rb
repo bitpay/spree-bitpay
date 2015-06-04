@@ -24,4 +24,20 @@ feature "Creating a new BitPay Payment Method", js: true, type: :feature do
     expect(page).not_to have_selector('#bitpay_api_uri option[value="https://bitpay.com"]'), "Livenet dropdown"
   end
   
+  scenario "The payment method is not authenticated" do
+    login_admin
+    create_new_payment_method "Bitcoind", "Spree::PaymentMethod::BitPay"
+    expect(find("#bitpay_pairing_status")).to have_content('Not Authenticated')
+  end
+
+  scenario "The payment method is authenticated" do
+    @bpclient = mock_model('BitPayClient')
+    allow_any_instance_of(Spree::PaymentMethod::BitPay).to receive(:bit_pay_client).and_return(@bpclient)
+    allow(@bpclient).to receive(:get_tokens).and_return([{ 'pos' => '5aDx4WYPZ8MYJh95APqStERrKcGPucUyC3E412b4dV8m' }, { 'merchant' => '5aDx4WYPZ8MYJh95APqStERrKcGPucUyC3E412b4dV8m' }])
+    allow(@bpclient).to receive(:api_uri).and_return("https://this.old.man")
+    login_admin
+    create_new_payment_method "We are paired", "Spree::PaymentMethod::BitPay"
+    expect(find("#bitpay_pairing_status")).to have_content("Authenticated with https://this.old.man")
+  end
+
 end
