@@ -7,6 +7,16 @@ describe Spree::PaymentMethod::BitPayment do
     expect(subject.association(:bit_pay_client).class).to eq(ActiveRecord::Associations::HasOneAssociation)
   end
 
+  context 'payment_profiles' do
+    it 'should support payment profiles' do
+      expect(subject.payment_profiles_supported?).to be true
+    end
+
+    it 'should create a nil profile' do
+      expect(subject.create_profile("anything")).to be_nil
+    end
+  end
+  
   context '.authenticate_with_bitpay' do
     it 'should create a new BitPayClient with itself when attempting to pair' do
       bpclient = mock_model('BitPayClient')

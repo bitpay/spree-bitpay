@@ -31,6 +31,14 @@ module Spree
       self.bit_pay_client.api_uri
     end
 
+    def payment_profiles_supported?
+      true
+    end
+
+    def create_profile payment
+      nil
+    end
+
     private
     
     def check_tokens response
