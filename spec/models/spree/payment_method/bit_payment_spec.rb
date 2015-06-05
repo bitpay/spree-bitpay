@@ -1,19 +1,33 @@
 require 'spec_helper'
 
-describe Spree::PaymentMethod::BitPay do
-  subject { Spree::PaymentMethod::BitPay.create! name: 'aba' }
+describe Spree::PaymentMethod::BitPayment do
+  subject { Spree::PaymentMethod::BitPayment.create! name: 'aba' }
 
   it 'should have a has_one association with bit_pay_client' do
     expect(subject.association(:bit_pay_client).class).to eq(ActiveRecord::Associations::HasOneAssociation)
   end
 
+  it 'should have a source' do
+    expect(subject.payment_source_class).to be(Spree::BitPayInvoice)
+  end
+  
+  context 'payment_profiles' do
+    it 'should support payment profiles' do
+      expect(subject.payment_profiles_supported?).to be true
+    end
+
+    it 'should create a nil profile' do
+      expect(subject.create_profile("anything")).to be_nil
+    end
+  end
+  
   context '.authenticate_with_bitpay' do
     it 'should create a new BitPayClient with itself when attempting to pair' do
       bpclient = mock_model('BitPayClient')
       random_string = ('0'..'z').to_a.sample((rand(10) + 10)).join
       allow(bpclient).to receive(:save!)
       allow(bpclient).to receive(:get_pairing_code).with(no_args)
-      expect(BitPayClient).to receive(:create).with(api_uri: random_string, bit_pay_id: subject.id).and_return(bpclient)
+      expect(BitPayClient).to receive(:create).with(api_uri: random_string, bit_payment_id: subject.id).and_return(bpclient)
       subject.authenticate_with_bitpay(random_string)
     end
 
@@ -28,7 +42,7 @@ describe Spree::PaymentMethod::BitPay do
       random_pairing_code = ('0'..'z').to_a.sample(7).join
       allow(bpclient).to receive(:save!)
       allow(bpclient).to receive(:get_pairing_code).with(no_args).and_return(random_pairing_code)
-      allow(BitPayClient).to receive(:create).with(api_uri: random_string, bit_pay_id: subject.id).and_return(bpclient)
+      allow(BitPayClient).to receive(:create).with(api_uri: random_string, bit_payment_id: subject.id).and_return(bpclient)
       expect(subject.authenticate_with_bitpay(random_string)).to eq(random_pairing_code)
     end
 

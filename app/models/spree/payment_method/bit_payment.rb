@@ -2,13 +2,13 @@ require 'bit_pay_rails'
 require 'pry'
 
 module Spree
-  class PaymentMethod::BitPay < PaymentMethod
+  class PaymentMethod::BitPayment < PaymentMethod
     has_one :bit_pay_client
 
     def authenticate_with_bitpay uri
-      client_check = BitPayClient.find_by_bit_pay_id(self.id)
+      client_check = BitPayClient.find_by_bit_payment_id(self.id)
       client_check.destroy! unless client_check.nil?
-      client = BitPayClient.create(api_uri: uri, bit_pay_id: self.id)
+      client = BitPayClient.create(api_uri: uri, bit_payment_id: self.id)
       client.save!
       client.get_pairing_code
     end
@@ -29,6 +29,18 @@ module Spree
 
     def api_uri
       self.bit_pay_client.api_uri
+    end
+
+    def payment_source_class
+      Spree::BitPayInvoice
+    end
+
+    def payment_profiles_supported?
+      true
+    end
+
+    def create_profile payment
+      nil
     end
 
     private

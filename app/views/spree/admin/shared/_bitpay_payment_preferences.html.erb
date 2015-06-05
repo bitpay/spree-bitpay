@@ -1,10 +1,10 @@
-<% if @object.instance_of?(Spree::PaymentMethod::BitPay) %>
+<% if @object.instance_of?(Spree::PaymentMethod::BitPayment) %>
   <% if @object.bit_pay_client and @object.paired? %>
     <div id="bitpay_pairing_status">Authenticated with <%= @object.api_uri %></div>
   <% else %>
     <div id="bitpay_pairing_status">Not Authenticated</div>
   <% end %>
-  <%= form_tag(admin_payment_method_bit_pays_authenticate_path) do |f| %>
+  <%= form_tag(admin_payment_method_bit_payments_authenticate_path) do |f| %>
     <div class="form-group">
       <label>Authenticate with BitPay</label>
       <select class="select2" name="bitcoin_network" id="bitpay_api_uri">
