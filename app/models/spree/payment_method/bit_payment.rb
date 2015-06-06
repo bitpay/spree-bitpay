@@ -31,6 +31,10 @@ module Spree
       self.bit_pay_client.api_uri
     end
 
+    def payment_source_class
+      Spree::BitPayInvoice
+    end
+
     def payment_profiles_supported?
       true
     end

@@ -7,6 +7,10 @@ describe Spree::PaymentMethod::BitPayment do
     expect(subject.association(:bit_pay_client).class).to eq(ActiveRecord::Associations::HasOneAssociation)
   end
 
+  it 'should have a source' do
+    expect(subject.payment_source_class).to be(Spree::BitPayInvoice)
+  end
+  
   context 'payment_profiles' do
     it 'should support payment profiles' do
       expect(subject.payment_profiles_supported?).to be true
