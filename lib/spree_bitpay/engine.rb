@@ -20,5 +20,7 @@ module SpreeBitpay
     end
 
     config.to_prepare &method(:activate).to_proc
+
+    Spree::PermittedAttributes.source_attributes.push(:bogus)
   end
 end
