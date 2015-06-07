@@ -43,6 +43,9 @@ module Spree
       nil
     end
 
+    def source_required?
+      false
+    end
     private
     
     def check_tokens response
