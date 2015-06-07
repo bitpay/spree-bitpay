@@ -14,11 +14,5 @@ module Spree
     def imported
       false
     end
-
-    # Gets the JSON invoice from Bitpay
-    def find_invoice
-      payment_method.find_invoice(invoice_id)
-    end
-
   end
 end
