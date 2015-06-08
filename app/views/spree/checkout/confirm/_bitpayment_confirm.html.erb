@@ -1,0 +1,53 @@
+<% if (payment.payment_method.is_a? Spree::PaymentMethod::BitPayment) && (payment.state != 'void') %>
+<% pm = payment.payment_method %>
+<%= image_tag("BC_nBG_64px.png") %>
+<script type="text/javascript">
+  $(document).ready(function() {
+    $('[data-hook="buttons"] input[name="commit"]').click(Bitpay.checkout);
+    $('#checkout_form_confirm').removeAttr("action");
+    $('#checkout_form_confirm').removeAttr("method");
+
+    $('#bitpay_checkout_modal').easyModal({
+      overlayClose: false,
+      closeOnEscape: false
+      });
+
+    Bitpay.invoiceUrl = "<%= j bitpay_pay_now_url(pmid: pm.id).html_safe %>";
+    Bitpay.checkUrl = "<%= j bitpay_check_url %>";
+    Bitpay.apiEndpoint = "<%= pm.api_uri %>";			
+  })
+
+window.addEventListener('message', Bitpay.finishCheckout, false);
+
+</script>
+
+<div id="bitpay_checkout_modal">
+  <div id="bitpay_modal_content">
+    <div id="bitpay_invoice">
+      <iframe id="bitpay_invoice_iframe"
+      scrolling="no" 
+      allowtransparency="true" 
+      frameborder="0", >
+      </iframe>
+    </div>
+    <div id="bitpay_checkout_guidance">
+      <span id="instructions"><%= simple_format Spree.t(:bitpay_payment_instructions) %></span>
+      <span id="completed" style="display:none"><%= Spree.t(:bitpay_payment_completed) %></span>
+      <span id="expired" style="display:none"><%= Spree.t(:bitpay_invoice_expired) %></span>
+      </br>
+    </div>
+    <div id="bitpay_payment_buttons" class="form-buttons">
+      <a 	id="continue_to_invoice" 
+      class="button disabled" 
+      disabled="disabled" 
+      href="<%= bitpay_payment_sent_url %>">
+      <span><%= Spree.t(:bitpay_view_invoice) %></span>
+      </a>
+    <%= link_to Spree.t(:bitpay_cancel), bitpay_cancel_url, {id: "choose_another_method", class: "button primary"} %>
+    </div>
+  </div>
+</div>
+
+<% end %>
+
+
