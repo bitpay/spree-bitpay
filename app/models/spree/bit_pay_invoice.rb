@@ -14,5 +14,9 @@ module Spree
     def imported
       false
     end
+
+    def bitpay_order_placed bitpay_invoice_id
+      update_attribute(:invoice_id, bitpay_invoice_id)
+    end
   end
 end

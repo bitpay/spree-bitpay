@@ -15,7 +15,23 @@ RSpec.describe Spree::BitPayInvoice, type: :model do
   it 'must respond to imported' do
     expect(subject.respond_to?(:imported)).to be true
   end
+  it 'should return false to imported' do
+    expect(subject.imported).to be false
+  end
+
   it 'handles the "void" action' do
     expect(subject.actions).to eq(["void"])
+  end
+
+  context '.bitpay_order_placed' do
+    it "responds to bitpay_order_placed" do
+      expect(subject.respond_to?(:bitpay_order_placed)).to be true
+    end
+
+    it 'sets the invoice id' do
+      newid = n_random_alpha_nums(6)
+      subject.bitpay_order_placed(newid)
+      expect(subject.invoice_id).to eq(newid)
+    end
   end
 end
