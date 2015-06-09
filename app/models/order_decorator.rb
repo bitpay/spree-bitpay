@@ -12,5 +12,9 @@ module Spree
       return checkout.last if checkout.any?
       return processing.last if processing.any?
     end
+
+    def cancel_bitpay_payment
+      payments.each(&:cancel_bitpay_payment)
+    end
   end
 end

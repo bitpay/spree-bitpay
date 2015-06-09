@@ -1,6 +1,22 @@
 require 'spec_helper'
 
 describe Spree::Payment do
+  context '.cancel_bitpay_payment' do
+    it 'responds to cancel_bitpay_payment' do
+      expect(subject.respond_to?(:cancel_bitpay_payment)).to be true
+    end
+    it 'will cancel a processing bitpay payment' do
+      payment = create(:processing_bp_payment, order: create(:order))
+      payment.cancel_bitpay_payment
+      expect(payment.state).to eq('void')
+    end
+    it 'will not cancel a processing not bitpay payment' do
+      payment = create(:payment, state: 'processing')
+      payment.cancel_bitpay_payment
+      expect(payment.state).to eq('processing')
+    end
+  end
+
   context ".place_bitpay_order" do
       before do
         subject.stub(:number).and_return "THISVALUE"
@@ -10,16 +26,16 @@ describe Spree::Payment do
         @params = { price: "25.00",
                    currency: "AUS",
                    orderID: "5678qwer",
-                   notification_url: "https://this.url",
+                   notificationURL: "https://this.url",
                    posData: posDataJson,
-                   fullNotifications: "true"}
+                   fullNotifications: true}
         @bpay = mock_model('Spree::PaymentMethod::BitPayment')
         @source = mock_model('Spree::BitPayInvoice')
         Spree::Payment.any_instance.stub(:payment_method).and_return(@bpay)
         Spree::Payment.any_instance.stub(:source).and_return(@source)
         allow(@source).to receive(:bitpay_order_placed)
         @invoice = {'id' => '12345', 'url' => 'https://that.url', 'price' => 24.00}
-        @incoming_params = { notification_url: "https://this.url", orderID: "5678qwer", price: "25.00", currency: "AUS" }
+        @incoming_params = { notificationURL: "https://this.url", orderID: "5678qwer", price: "25.00", currency: "AUS" }
       end
     context "the payment state is 'checkout'" do
       it "responds to place_bitpay_order" do

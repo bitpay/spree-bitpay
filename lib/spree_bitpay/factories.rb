@@ -23,6 +23,9 @@ FactoryGirl.define do
     factory :invalid_payment do
       state 'invalid'
     end    
+    factory :processing_bp_payment do
+      state 'processing'
+    end
   end
 end
 
