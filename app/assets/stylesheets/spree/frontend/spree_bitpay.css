@@ -1,4 +1,58 @@
-/*
-Placeholder manifest file.
-the installer will append this file to the app vendored assets here: 'vendor/assets/stylesheets/spree/frontend/all.css'
+/* 
+ *= require spree/frontend
 */
+// Bitpay Payment Method styling
+
+// No idea why this element is needed but it seems the first entry is ignored??
+// TODO: Is this really needed?
+
+#throwaway {
+	width: 20px;
+}
+
+#bitpay_modal_content {
+	padding:40px;
+	background-color: #FFF;
+}
+
+#bitpay_invoice_iframe {
+	width: 500px;
+	//height: 150px;
+	border: 1px solid #d9d9db;
+	overflow: hidden;
+	padding:20px;
+	max-width: 100%;
+}
+
+
+#bitpay_view_invoice_iframe {
+	width: 542px;
+	//height: 150px;
+	border: 1px solid #d9d9db;
+	overflow: hidden;
+	padding:20px;
+	max-width: 100%;
+}
+
+#bitpay_checkout_guidance {
+	text-align: center;
+	margin: auto;
+}
+
+#bitpay_payment_buttons {
+	padding-top: 10px;
+	text-align: center;
+}
+
+a.button.disabled {
+	background-color: #727276;
+	border-color: #59595c;
+	color: #CCC;
+	opacity: .65;
+	pointer-events: none;
+}
+
+.bitpay_invoice_details {
+	padding-top: 20px;
+	padding-bottom: 20px;
+}

@@ -86,4 +86,10 @@ RSpec.configure do |config|
 
   config.fail_fast = ENV['FAIL_FAST'] || false
   config.order = "random"
+
+end
+
+# retrieve a fixture by file name
+def get_fixture(name)
+  JSON.parse(File.read(File.expand_path("../fixtures/#{name}", __FILE__)))
 end

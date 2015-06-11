@@ -16,5 +16,11 @@ module Spree
     def cancel_bitpay_payment
       payments.each(&:cancel_bitpay_payment)
     end
+
+    def process_bitpay_ipn payment_id
+      payment = payments.find_by_number(payment_id)
+      payment.process_bitpay_ipn
+    end
+
   end
 end

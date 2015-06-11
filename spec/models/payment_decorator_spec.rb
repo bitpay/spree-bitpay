@@ -1,6 +1,69 @@
 require 'spec_helper'
-
 describe Spree::Payment do
+  context '.process_bitpay_ipn' do
+    before do
+      @source_id = n_random_alpha_nums(10)
+      @bpay = mock_model('Spree::PaymentMethod::BitPayment')
+      @source = mock_model('Spree::BitPayInvoice')
+      allow_any_instance_of(Spree::Payment).to receive(:payment_method).and_return(@bpay)
+      allow_any_instance_of(Spree::Payment).to receive(:source).and_return(@source)
+      allow(@source).to receive(:invoice_id).and_return(@source_id)
+    end
+
+    it 'responds to process_bitpay_ipn' do
+      expect(subject.respond_to?(:process_bitpay_ipn)).to be true
+    end
+
+    it 'calls the payment method' do
+      payment = create(:processing_bp_payment, order: create(:order))
+      expect(@bpay).to receive(:get_invoice).with(id: @source_id).and_return(get_fixture('valid_new_invoice.json'))
+      payment.process_bitpay_ipn
+    end
+
+    context 'invoice status is new' do
+      it 'starts processing the order' do
+        payment = create(:processable_bp_payment, order: create(:order))
+        expect(@bpay).to receive(:get_invoice).with(id: @source_id).and_return(get_fixture("valid_new_invoice.json"))
+        payment.process_bitpay_ipn
+        expect(payment).to be_processing
+      end
+    end
+
+    context 'invoice status is paid' do
+      it 'pends the payment' do
+        payment = create(:processing_bp_payment, order: create(:order))
+        expect(@bpay).to receive(:get_invoice).with(id: @source_id).and_return(get_fixture("valid_paid_invoice.json"))
+        payment.process_bitpay_ipn
+        expect(payment).to be_pending
+      end
+    end
+    context 'invoice status is confirmed' do
+      it 'completes the payment' do
+        payment = create(:completable_bp_payment, order: create(:order))
+        expect(@bpay).to receive(:get_invoice).with(id: @source_id).and_return(get_fixture("valid_confirmed_invoice.json"))
+        payment.process_bitpay_ipn
+        expect(payment).to be_completed
+      end
+    end
+    context 'invoice status is complete' do
+      it 'completes the payment' do
+        payment = create(:completable_bp_payment, order: create(:order))
+        expect(@bpay).to receive(:get_invoice).with(id: @source_id).and_return(get_fixture("valid_complete_invoice.json"))
+        payment.process_bitpay_ipn
+        expect(payment).to be_completed
+      end
+    end
+    context 'invoice status is expired' do
+      it 'fails the payment' do
+        payment = create(:failable_bp_payment, order: create(:order))
+        expect(@bpay).to receive(:get_invoice).with(id: @source_id).and_return(get_fixture("valid_expired_invoice.json"))
+        state = payment.process_bitpay_ipn
+        expect(payment).to be_failed
+        expect(state).to be :failed 
+      end
+    end
+  end
+
   context '.cancel_bitpay_payment' do
     it 'responds to cancel_bitpay_payment' do
       expect(subject.respond_to?(:cancel_bitpay_payment)).to be true
@@ -55,11 +118,6 @@ describe Spree::Payment do
       it 'returns the entire invoice' do 
         allow(@bpay).to receive(:create_invoice).with(@params).and_return(@invoice)
         expect(subject.place_bitpay_order( @incoming_params)).to eq(@invoice)
-      end
-      it 'starts processing' do
-        expect(subject).to receive(:started_processing!)
-        allow(@bpay).to receive(:create_invoice).with(@params).and_return(@invoice)
-        subject.place_bitpay_order @incoming_params
       end
     end
     context "the payment state is not 'checkout'" do
