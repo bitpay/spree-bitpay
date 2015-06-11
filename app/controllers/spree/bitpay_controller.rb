@@ -6,6 +6,7 @@ module Spree
     #
     def pay_now
       order = current_order || raise(ActiveRecord::RecordNotFound)
+      session[:order_number] = current_order.number
       invoice = order.place_bitpay_order notificationURL: bitpay_notification_url
       @invoice_iframe_url = "#{invoice['url']}&view=iframe"
       render json: @invoice_iframe_url
@@ -36,7 +37,9 @@ module Spree
     # Fires on receipt of payment received window message
     #
     def payment_sent
-      order = current_order || raise(ActiveRecord::RecordNotFound)
+      order_number = session[:order_number]
+      session[:order_number] = nil
+      order = Spree::Order.find_by_number(order_number) || raise(ActiveRecord::RecordNotFound)
       redirect_to spree.order_path(order), :notice => Spree.t(:order_processed_successfully)
     end
 
@@ -45,28 +48,26 @@ module Spree
     #
     def notification
 
-      posData = JSON.parse(params["posData"])
+      begin
+        posData = JSON.parse(params["posData"])
 
-      order_id = posData["orderID"]
-      payment_id = posData["paymentID"]
+        order_id = posData["orderID"]
+        payment_id = posData["paymentID"]
 
-      # Get OFFICIAL Invoice from BitPay API
-      # Fetching payment this way should prevent any false payment/order mismatch
-      order = Spree::Order.find_by_number(order_id) || raise(ActiveRecord::RecordNotFound)
-      payment = order.payments.find_by(identifier: payment_id) || raise(ActiveRecord::RecordNotFound)
-      invoice = payment.source.find_invoice
-
-      if invoice
-        logger.debug("Bitpay Invoice Content: " + invoice.to_json)
-        process_invoice(invoice)
-        head :ok
-      else
-        raise "Spree_Bitpay:  No invoice found for notification for #{payment.identifier} from #{request.remote_ip}"
+        # Get OFFICIAL Invoice from BitPay API
+        # Fetching payment this way should prevent any false payment/order mismatch
+        order = Spree::Order.find_by_number(order_id) || raise(ActiveRecord::RecordNotFound)
+        begin
+          order.process_bitpay_ipn payment_id
+          head :ok
+        rescue => exception
+          logger.debug exception
+          head :uprocessable_entity
+        end
+      rescue => error
+        logger.error "Spree_Bitpay:  Unprocessable notification received from #{request.remote_ip}: #{params.inspect}"
+        head :unprocessable_entity	
       end
-
-    rescue
-      logger.error "Spree_Bitpay:  Unprocessable notification received from #{request.remote_ip}: #{params.inspect}"
-      head :unprocessable_entity	
     end
 
     # Reprocess Invoice and update order status 
