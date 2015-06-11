@@ -20,6 +20,10 @@ FactoryGirl.define do
       payment.order.update!
     end
 
+    factory :voidable_bp_payment do
+      new_state = [:pending, :processing, :completed, :checkout].sample
+      state new_state
+    end    
     factory :failable_bp_payment do
       new_state = [:pending, :processing].sample
       state new_state
@@ -31,6 +35,17 @@ FactoryGirl.define do
     factory :processable_bp_payment do
       new_state = [:checkout, :pending, :completed, :processing].sample
       state new_state
+    end    
+    factory :pendable_bp_payment do
+      new_state = [:checkout, :processing].sample
+      state new_state
+    end    
+    factory :uncheckout_bp_payment do
+      new_state = [:pending, :completed, :processing, :invalid, :void].sample
+      state new_state
+    end    
+    factory :void_bp_payment do
+      state 'void'
     end    
     factory :checkout_bp_payment do
       state 'checkout'

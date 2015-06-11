@@ -54,8 +54,6 @@ module Spree
         order_id = posData["orderID"]
         payment_id = posData["paymentID"]
 
-        # Get OFFICIAL Invoice from BitPay API
-        # Fetching payment this way should prevent any false payment/order mismatch
         order = Spree::Order.find_by_number(order_id) || raise(ActiveRecord::RecordNotFound)
         begin
           order.process_bitpay_ipn payment_id

@@ -14,7 +14,6 @@ module Spree
 
     def cancel_bitpay_payment
       if state == 'processing' && payment_method.class == Spree::PaymentMethod::BitPayment
-        pend
         void
       end
     end
@@ -22,27 +21,40 @@ module Spree
     def process_bitpay_ipn
       invoice_id = source.invoice_id
       invoice = payment_method.get_invoice(id: invoice_id)
-      process_invoice(invoice['status'])
+      process_invoice(invoice['status'], invoice['exceptionStatus'])
       state.to_sym
     end
 
     private
 
-    def process_invoice status
+    def process_invoice (status, exception_status = nil)
       case status
       when 'new'
         started_processing
       when 'paid'
-        order.update!
-        order.next
-        pend!
+        if state == 'checkout'
+          update_and_state :pend!
+        elsif state == 'invalid'
+          update_attribute(:state, 'checkout')
+          update_and_state :pend!
+        end
        when 'complete', 'confirmed'
-        order.update!
-        order.next
-        complete
+         update_and_state :complete
+       when 'expired'
+         if exception_status == false
+           self.update_attribute(:state, 'invalid')
+         else
+           void
+         end
       else
         failure
       end
+    end
+
+    def update_and_state state
+      order.update!
+      order.next
+      send state
     end
   end
 end
