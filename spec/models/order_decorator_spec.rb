@@ -61,5 +61,22 @@ describe Spree::Order do
       order.process_bitpay_ipn pay_id
     end
   end
+
+  context "#validate_bitpay_payment" do
+    it "returns the paymets unchanged if there is only one processing payment, and no checkout payments" do
+      FactoryGirl.create(:invalid_bp_payment, order: subject)
+      subject.update!
+      subject.validate_bitpay_payment
+      expect(subject.payments.map(&:state)).to eq ['processing', 'invalid']
+    end
+
+    it "returns a checkout payment if there is a checkout payment and a processing payment" do
+      checkout_payment = FactoryGirl.create(:abstract_btc_payment, order: subject, state: 'checkout')
+      subject.update!
+      subject.validate_bitpay_payment
+      expect(subject.payments.map(&:state)).to eq ['failed', 'checkout']
+    end
+  end
+
 end
 
