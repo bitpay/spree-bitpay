@@ -18,5 +18,10 @@ module Spree
     def bitpay_order_placed bitpay_invoice_id
       update_attribute(:invoice_id, bitpay_invoice_id)
     end
+
+    def find_invoice
+      payment_method.get_invoice(id: invoice_id)
+    end
+
   end
 end
