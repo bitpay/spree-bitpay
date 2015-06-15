@@ -15,11 +15,18 @@ FactoryGirl.define do
     amount { order.total }
     response_code 'BTC'
     after(:create) do |payment|
-      payment.number = n_random_alpha_nums(8)
       payment.save!
       payment.order.update!
     end
 
+    factory :uncompletable_bp_payment do
+      new_state = [:void, :invalid].sample
+      state new_state
+    end
+    factory :unpayable_bp_payment do
+      new_state = [:pending, :completed, :processing, :void].sample
+      state new_state
+    end
     factory :voidable_bp_payment do
       new_state = [:pending, :processing, :completed, :checkout].sample
       state new_state

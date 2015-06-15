@@ -14,3 +14,5 @@ en:
     bitpay_refresh_invoice_description: "Re-poll BitPay invoice and update order status"
     bitpay_payment_updated: "Payment status changed to: "
     bitpay_payment_not_updated: "No status change detected."
+    bitpay_user_id: "BitPay Account"
+    bitpay_invoice_id: "Invoice ID"

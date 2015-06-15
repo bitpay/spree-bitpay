@@ -22,7 +22,6 @@ module Spree
       invoice_id = source.invoice_id
       invoice = payment_method.get_invoice(id: invoice_id)
       process_invoice(invoice['status'], invoice['exceptionStatus'])
-      state.to_sym
     end
 
     private
@@ -38,8 +37,10 @@ module Spree
           update_attribute(:state, 'checkout')
           update_and_state :pend!
         end
+        order_is_complete!
        when 'complete', 'confirmed'
          update_and_state :complete
+         order_is_complete!
        when 'expired'
          if exception_status == false
            self.update_attribute(:state, 'invalid')
@@ -55,6 +56,10 @@ module Spree
       order.update!
       order.next
       send state
+    end
+
+    def order_is_complete!
+      raise "Unable to complete. Order: #{order.number} receive unexpected BitPay ipn for payment #{number}" unless order.complete?
     end
   end
 end

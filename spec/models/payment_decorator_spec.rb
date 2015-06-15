@@ -20,6 +20,98 @@ describe Spree::Payment do
       payment.process_bitpay_ipn
     end
 
+    context 'invoice status is new' do
+      it 'starts processing the order' do
+        payment = create(:processable_bp_payment, order: create(:order))
+        expect(@bpay).to receive(:get_invoice).with(id: @source_id).and_return(get_fixture("valid_new_invoice.json"))
+        payment.process_bitpay_ipn
+        expect(payment).to be_processing
+      end
+    end
+
+    context 'invoice status is paid' do
+      let!(:order){create :order}
+      before do
+        allow(@bpay).to receive(:get_invoice)
+                     .with(id: @source_id)
+                     .and_return(get_fixture("valid_paid_invoice.json"))
+      end
+      context 'order can be paid' do
+        before { allow(order).to receive(:complete?).and_return true }
+        context 'payment is in checkout state' do
+          let!(:payment){create(:checkout_bp_payment, order: order)}
+          it 'pends the payment' do
+            payment.process_bitpay_ipn
+            expect(payment).to be_pending
+          end
+          it 'updates the payment order' do
+            expect(order).to receive(:update!)
+            expect(order).to receive(:next)
+            payment.process_bitpay_ipn
+          end
+        end
+        context 'payment is in invalid state' do
+          let!(:payment){create(:invalid_bp_payment, order: order)}
+          before do
+            allow(order).to receive(:complete?).and_return true
+          end
+          it 'pends the payment' do
+            payment.process_bitpay_ipn
+            expect(payment).to be_pending
+          end
+          it 'updates the payment order' do
+            expect(order).to receive(:update!)
+            expect(order).to receive(:next)
+            payment.process_bitpay_ipn
+          end
+        end
+      end
+      context 'payment cannot be paid' do
+        it "should throw an error" do
+          payment = create(:unpayable_bp_payment, order: order)
+          allow(order).to receive(:complete?).and_return false
+          expect{payment.process_bitpay_ipn}.to raise_error "Unable to complete. Order: #{order.number} receive unexpected BitPay ipn for payment #{payment.number}"
+        end
+      end
+    end
+
+    context 'invoice status is confirmed or complete' do
+      let!(:order) {create(:order)}
+      context 'the payment can be completed' do
+        before{ allow(order).to receive(:complete?).and_return(true) }
+        let!(:payment) {create(:completable_bp_payment, order: order)}
+        context 'invoice status is confirmed' do
+          before do
+            allow(@bpay).to receive(:get_invoice).with(id: @source_id).and_return(get_fixture("valid_confirmed_invoice.json"))
+          end
+          it 'completes the payment' do
+            payment.process_bitpay_ipn
+            expect(payment).to be_completed
+          end
+
+          it 'updates the payment order' do
+            expect(order).to receive(:update!)
+            expect(order).to receive(:next)
+            payment.process_bitpay_ipn
+          end
+        end
+        context 'invoice status is complete' do
+          it 'completes the payment' do
+            allow(@bpay).to receive(:get_invoice).with(id: @source_id).and_return(get_fixture("valid_complete_invoice.json"))
+            payment.process_bitpay_ipn
+            expect(payment).to be_completed
+          end
+        end
+      end
+      context 'the payment cannot be completed' do
+        it 'raises an error' do
+          payment = create(:uncompletable_bp_payment, order: order)
+          allow(@bpay).to receive(:get_invoice).with(id: @source_id).and_return(get_fixture("valid_confirmed_invoice.json"))
+          expect{payment.process_bitpay_ipn}.to raise_error "Unable to complete. Order: #{order.number} receive unexpected BitPay ipn for payment #{payment.number}"
+        end
+      end
+    end
+
     context 'invoice status is expired' do
       context 'the exception status is false' do
         it 'sets the payment state to invalid' do
@@ -42,94 +134,6 @@ describe Spree::Payment do
           payment.process_bitpay_ipn
           expect(payment.state).to eq 'void'
         end
-      end
-    end
-
-    context 'invoice status is new' do
-      it 'starts processing the order' do
-        payment = create(:processable_bp_payment, order: create(:order))
-        expect(@bpay).to receive(:get_invoice).with(id: @source_id).and_return(get_fixture("valid_new_invoice.json"))
-        payment.process_bitpay_ipn
-        expect(payment).to be_processing
-      end
-    end
-
-
-#      when "paid" 
-#
-#        # Move payment to pending state and complete order 	
-#
-#        if payment.state = "processing" # This is the most common scenario
-#          payment.pend!
-#        else # In the case it was previously marked invalid due to invoice expiry
-#          payment.state = "pending"
-#          payment.save
-#        end
-#
-#        payment.order.update!
-#        payment.order.next
-#        if (!payment.order.complete?)
-#          raise "Can't transition order #{payment.order.number} to COMPLETE state"	
-#        end
-    context 'invoice status is paid' do
-      context 'payment is in checkout state' do
-        it 'pends the payment' do
-          payment = create(:checkout_bp_payment, order: create(:order))
-          expect(@bpay).to receive(:get_invoice).with(id: @source_id).and_return(get_fixture("valid_paid_invoice.json"))
-          payment.process_bitpay_ipn
-          expect(payment).to be_pending
-        end
-        it 'updates the payment order' do
-          order = create(:order)
-          payment = create(:checkout_bp_payment, order: order)
-          expect(@bpay).to receive(:get_invoice).with(id: @source_id).and_return(get_fixture("valid_paid_invoice.json"))
-          expect(order).to receive(:update!)
-          expect(order).to receive(:next)
-          payment.process_bitpay_ipn
-        end
-      end
-      context 'payment is in invalid state' do
-        it 'pends the payment' do
-          payment = create(:invalid_bp_payment, order: create(:order))
-          expect(@bpay).to receive(:get_invoice).with(id: @source_id).and_return(get_fixture("valid_paid_invoice.json"))
-          payment.process_bitpay_ipn
-          expect(payment).to be_pending
-        end
-        it 'updates the payment order' do
-          order = create(:order)
-          payment = create(:invalid_bp_payment, order: order)
-          expect(@bpay).to receive(:get_invoice).with(id: @source_id).and_return(get_fixture("valid_paid_invoice.json"))
-          expect(order).to receive(:update!)
-          expect(order).to receive(:next)
-          payment.process_bitpay_ipn
-        end
-      end
-    end
-    context 'invoice status is confirmed' do
-      it 'completes the payment' do
-        payment = create(:completable_bp_payment, order: create(:order))
-        expect(@bpay).to receive(:get_invoice).with(id: @source_id).and_return(get_fixture("valid_confirmed_invoice.json"))
-        payment.process_bitpay_ipn
-        expect(payment).to be_completed
-      end
-
-      it 'updates the payment order' do
-        payment = create(:checkout_bp_payment, order: create(:order))
-        order = mock_model('Spree::Order')
-        expect(@bpay).to receive(:get_invoice).with(id: @source_id).and_return(get_fixture("valid_confirmed_invoice.json"))
-        expect(order).to receive(:update!)
-        expect(order).to receive(:next)
-        payment.stub(:order).and_return(order)
-        payment.stub(:complete).and_return(true)
-        payment.process_bitpay_ipn
-      end
-    end
-    context 'invoice status is complete' do
-      it 'completes the payment' do
-        payment = create(:completable_bp_payment, order: create(:order))
-        expect(@bpay).to receive(:get_invoice).with(id: @source_id).and_return(get_fixture("valid_complete_invoice.json"))
-        payment.process_bitpay_ipn
-        expect(payment).to be_completed
       end
     end
   end
