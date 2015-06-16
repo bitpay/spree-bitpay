@@ -16,11 +16,11 @@
 }
 
 #bitpay_invoice_iframe {
-	width: 500px;
+	width: 510px;
 	//height: 150px;
 	border: 1px solid #d9d9db;
 	overflow: hidden;
-	padding:20px;
+	padding:10px;
 	max-width: 100%;
 }
 
@@ -30,7 +30,7 @@
 	//height: 150px;
 	border: 1px solid #d9d9db;
 	overflow: hidden;
-	padding:20px;
+	padding:10px;
 	max-width: 100%;
 }
 
