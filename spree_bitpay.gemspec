@@ -2,7 +2,7 @@
 Gem::Specification.new do |s|
   s.platform    = Gem::Platform::RUBY
   s.name        = 'spree_bitpay'
-  s.version     = '3.0.2'
+  s.version     = '3.0.3'
   s.summary     = 'Accept bitcoin with BitPay'
   s.description = 'BitPay connector for the Spree shopping cart'
   s.required_ruby_version = '>= 2.0.0'
@@ -17,7 +17,7 @@ Gem::Specification.new do |s|
   s.requirements << 'none'
 
   s.add_dependency 'spree_core', '~> 3.0.1'
-  s.add_dependency 'bitpay-rails', '~> 2.0', :require 'bitpay_rails'
+  s.add_dependency 'bitpay-rails', '~> 2.0'
 
 
   s.add_development_dependency 'capybara', '~> 2.4'
