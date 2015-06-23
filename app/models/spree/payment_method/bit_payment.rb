@@ -1,5 +1,4 @@
 require 'bit_pay_rails'
-require 'pry'
 
 module Spree
   class PaymentMethod::BitPayment < PaymentMethod
