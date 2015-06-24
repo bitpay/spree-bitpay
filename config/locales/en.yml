@@ -1,16 +1,5 @@
+# Sample localization file for English. Add more files in this directory for other locales.
+# See https://github.com/svenfuchs/rails-i18n/tree/master/rails%2Flocale for starting points.
+
 en:
-  spree:
-    bitpay_cancel: "Choose another payment method"
-    bitpay_checkout_error: "Error with Bitcoin checkout"
-    bitpay_payment_completed: "Thank you for your payment."
-    bitpay_invoice_expired: "The invoice has expired.  Please re-select Bitcoin if you would like to retry."
-    bitpay_payment_instructions: |
-      Please pay the invoice above to continue.
-      The page will automatically refresh in a few seconds when transaction is broadcast.
-    bitpay_payment_method: "Payment will be requested following the confirmation."
-    bitpay_view_invoice: "Continue to Invoice"
-    bitpay_view_full_invoice: "View invoice at BitPay.com"
-    bitpay_refresh_invoice: "Reprocess Invoice"
-    bitpay_refresh_invoice_description: "Re-poll BitPay invoice and update order status"
-    bitpay_payment_updated: "Payment status changed to: "
-    bitpay_payment_not_updated: "No status change detected."
+  hello: "Hello world"

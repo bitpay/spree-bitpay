@@ -1,5 +1,3 @@
-require 'bitpay'
-
 module SpreeBitpay
   class Engine < Rails::Engine
     require 'spree/core'
@@ -11,9 +9,9 @@ module SpreeBitpay
       g.test_framework :rspec
     end
 
-    initializer "spree.bitpay.payment_methods", :after => "spree.register.payment_methods" do |app|
-      app.config.spree.payment_methods << Spree::PaymentMethod::Bitpay
-    end
+    initializer "spree.gateway.payment_methods", :after => "spree.register.payment_methods" do |app|
+      app.config.spree.payment_methods << Spree::PaymentMethod::BitPay
+    end 
 
     def self.activate
       Dir.glob(File.join(File.dirname(__FILE__), '../../app/**/*_decorator*.rb')) do |c|
@@ -24,5 +22,3 @@ module SpreeBitpay
     config.to_prepare &method(:activate).to_proc
   end
 end
-
-Spree::PermittedAttributes.source_attributes.push(:bogus)

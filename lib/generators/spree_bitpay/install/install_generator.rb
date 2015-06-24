@@ -6,7 +6,6 @@ module SpreeBitpay
 
       def add_javascripts
         append_file 'vendor/assets/javascripts/spree/frontend/all.js', "//= require spree/frontend/spree_bitpay\n"
-        append_file 'vendor/assets/javascripts/spree/frontend/all.js', "//= require easyModal.js-master/jquery.easyModal\n"
         append_file 'vendor/assets/javascripts/spree/backend/all.js', "//= require spree/backend/spree_bitpay\n"
       end
 
