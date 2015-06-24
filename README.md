@@ -6,7 +6,7 @@
 [![Code Climate](https://img.shields.io/codeclimate/github/bitpay/spree-bitpay.svg?style=flat-square)](https://codeclimate.com/github/bitpay/spree-bitpay)
 [![Coveralls](https://img.shields.io/coveralls/bitpay/spree-bitpay.svg?style=flat-square)](https://coveralls.io/r/bitpay/spree-bitpay)
 
-BitPay Payments connector for SpreeCommerce 2.2.x RoR storefront.  Accept bitcoin payments with ZERO fees.  Choose remittance in your local currency or take a percentage in BTC.  
+BitPay Payments connector for SpreeCommerce 3.0.x RoR storefront.  Accept bitcoin payments with ZERO fees.  Choose remittance in your local currency or take a percentage in BTC.  
 
 Sign up for your account at https://bitpay.com.  
 For development and testing against the bitcoin testnet, sign up at https://test.bitpay.com.
