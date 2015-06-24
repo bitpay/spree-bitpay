@@ -30,7 +30,7 @@ module Spree
 
       order = current_order || raise(ActiveRecord::RecordNotFound)
       order.cancel_bitpay_payment
-      redirect_to edit_order_url(order, state: 'payment'), :notice => Spree.t(:checkout_canceled)
+      redirect_to edit_order_url(order, state: 'payment'), :notice => Spree.t(:order_canceled)
 
     end
 
