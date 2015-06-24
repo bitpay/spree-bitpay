@@ -155,25 +155,24 @@ describe Spree::Payment do
   end
 
   context ".place_bitpay_order" do
-      before do
-        subject.stub(:number).and_return "THISVALUE"
-        subject.stub(:started_processing!)
-        allow(subject).to receive(:started_processing!)
-        posDataJson = {paymentID: subject.number, orderID: "5678qwer"}.to_json
-        @params = { price: "25.00",
-                   currency: "AUS",
-                   orderID: "5678qwer",
-                   notificationURL: "https://this.url",
-                   posData: posDataJson,
-                   fullNotifications: true}
-        @bpay = mock_model('Spree::PaymentMethod::BitPayment')
-        @source = mock_model('Spree::BitPayInvoice')
-        Spree::Payment.any_instance.stub(:payment_method).and_return(@bpay)
-        Spree::Payment.any_instance.stub(:source).and_return(@source)
-        allow(@source).to receive(:bitpay_order_placed)
-        @invoice = {'id' => '12345', 'url' => 'https://that.url', 'price' => 24.00}
-        @incoming_params = { notificationURL: "https://this.url", orderID: "5678qwer", price: "25.00", currency: "AUS" }
-      end
+    before do
+      allow(subject).to receive(:number).and_return "THISVALUE"
+      allow(subject).to receive(:started_processing!)
+      posDataJson = {paymentID: subject.number, orderID: "5678qwer"}.to_json
+      @params = { price: "25.00",
+                  currency: "AUS",
+                  orderID: "5678qwer",
+                  notificationURL: "https://this.url",
+                  posData: posDataJson,
+                  fullNotifications: true}
+      @bpay = mock_model('Spree::PaymentMethod::BitPayment')
+      @source = mock_model('Spree::BitPayInvoice')
+      allow_any_instance_of(Spree::Payment).to receive(:payment_method).and_return(@bpay)
+      allow_any_instance_of(Spree::Payment).to receive(:source).and_return(@source)
+      allow(@source).to receive(:bitpay_order_placed)
+      @invoice = {'id' => '12345', 'url' => 'https://that.url', 'price' => 24.00}
+      @incoming_params = { notificationURL: "https://this.url", orderID: "5678qwer", price: "25.00", currency: "AUS" }
+    end
     context "the payment state is 'checkout'" do
       it "responds to place_bitpay_order" do
         expect(subject.respond_to?(:place_bitpay_order)).to be true

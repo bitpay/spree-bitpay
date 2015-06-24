@@ -15,12 +15,16 @@ For development and testing against the bitcoin testnet, sign up at https://test
 
 ### Environment
 
-spree-bitpay relies on the bitpay-rails gem, which requires two environment variables to be set: BITPAY_SECRET and BITPAY_SALT. **You must set these environment variables**.
+`spree-bitpay` relies on the `bitpay-rails` gem, which requires two environment variables to be set: `BPSECRET` and `BPSALT`. **You must set these environment variables**.
+
+    $ export BPSECRET="YOURSECRETRIGHTHERE"
+    $ export BPSALT="YOURSALTHERE"
 
 ### Intalling the gem
 
 Add this line to your application's Gemfile:
 
+    gem 'bitpay-rails', gem 'bitpay-rails', require: 'bit_pay_rails'
     gem 'spree_bitpay', :git => 'https://github.com/bitpay/spree-bitpay.git'
 
 And then execute:
@@ -29,15 +33,22 @@ And then execute:
 
 Then run
 
+    $ rake bit_pay_rails_engine:install:migrations
+    $ rake db:migrate
+
+Failing to run the `bit_pay_rails` migrations before running the `spree_bitpay` migrations will cause the `spree_bitpay` migrations to fail, the `spree_bitpay` migrations have associations to the `bit_pay_rails` tables.
+
     $ rails generate spree_bitpay:install
+
+Depending on your deployment configuration, you may need to precompile assets at this point in order to load the javascript files for the spree_bitpay gem.
 
 The BitPay Spree connector receives RESTful confirmation callbacks at the `bitpay_notification_url` (typically `http://<host>/spree_bitpay/notification`).  **This route must be available to receive messages from https://bitpay.com for proper operation**.  This may require changes to your network configuration if your server is behind a firewall.  The connector has been implemented to verify any callbacks received at this route, to prevent fraudulent/spoof messages.
 
 ## Application Configuration
 
-Once installed, configure the BitPay payment method by logging into the Admin console by browsing to Configuration > Payment Methods.
+Once installed, configure the BitPayment payment method by logging into the Admin console by browsing to Configuration > Payment Methods.
 
-Click the  "+ New Payment Method" button and choose the provider titled `Spree::PaymentMethod::Bitpayment`.  Type a unique name that will be displayed to users when selecting a payment method. Click the `Create` button.
+Click the  "+ New Payment Method" button and choose the provider titled `Spree::PaymentMethod::BitPayment`.  Type a unique name that will be displayed to users when selecting a payment method. Click the `Create` button.
 
 Once you have created the new payment method, it must be authenticated with BitPay. Select either `LiveNet` or `TestNet` from the dropdown and click the `Authenticate` button. This should redirect you to BitPay to authenticate the payment method.
 
@@ -74,10 +85,8 @@ At any point, the details and current status of a BitPay payment can be viewed b
 
 The BitPay Spree connector uses RSpec, Capybara, and Poltergeist to perform integration testing.  To set up and run the tests, you must install PhantomJS, as described [here](https://github.com/teampoltergeist/poltergeist#installing-phantomjs).  Then execute the following steps:
 
-    export BITPAYKEY=<your test.bitpay.com api key here>
-    bundle install
-    ./testapp.sh
-    rake
+   $ source spec/set_constants.sh https://test.bitpay.com <yourusername> <yourpassword>
+   $ bundle exec rake
 
 ## Support
 
