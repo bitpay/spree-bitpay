@@ -6,20 +6,20 @@
 
     <div id="bitpay_pairing_status"><h4>Not Authenticated</h4></div>
     <div id="bitpay_explanation_text">The TestNet option uses testnet bitcoin, which cannot be exchanged for bitcoin or for other currencies.<br/>For more help, visit the <a href="https://github.com/bitpay/spree-bitpay">plugin homepage</a> or <a href="https://support.bitpay.com/hc/en-us/requests/new">submit a support request.</a></div>
-  <% end %>
-  <%= form_tag(payment_method_bit_payments_authenticate_path) do |f| %>
-    <div class="form-group">
-      <label>Authenticate with BitPay</label>
-      <select class="select2" name="bitcoin_network" id="bitpay_api_uri">
-      <option value="https://bitpay.com">LiveNet</option>
-      <option value="https://test.bitpay.com">TestNet</option>
-      <% if Rails.env == "development" || Rails.env == "test" %>
-        <option value=<%= ENV['BPDEVSERVER'] %>>Development</option>
-      <% end %>
-      </select>
-      <input type="hidden" name="redirect_url" value=<%= @_request.original_url %>>
-      <input type="hidden" name="payment_method_id" value=<%= @payment_method.id %>>
-      <input class="btn btn-primary" type="submit" value="Authenticate with BitPay">
-    </div>
+    <%= form_tag(payment_method_bit_payments_authenticate_path) do |f| %>
+      <div class="form-group">
+        <label>Connect to BitPay</label>
+        <select class="select2" name="bitcoin_network" id="bitpay_api_uri">
+          <option value="https://bitpay.com">LiveNet</option>
+          <option value="https://test.bitpay.com">TestNet</option>
+          <% if Rails.env == "development" || Rails.env == "test" %>
+            <option value=<%= ENV['BPDEVSERVER'] %>>Development</option>
+          <% end %>
+        </select>
+        <input type="hidden" name="redirect_url" value=<%= @_request.original_url %>>
+        <input type="hidden" name="payment_method_id" value=<%= @payment_method.id %>>
+        <input class="btn btn-primary" type="submit" value="Connect To BitPay">
+      </div>
+    <% end %>
   <% end %>
 <% end %>

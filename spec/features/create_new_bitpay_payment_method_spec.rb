@@ -14,7 +14,7 @@ feature "Creating a new BitPay Payment Method", js: true, type: :feature do
     create_new_payment_method "Bitcoin", "Spree::PaymentMethod::BitPayment"
     old_url = current_url
     select("Development", from: "bitcoin_network")
-    find_button("Authenticate with BitPay").click
+    find_button("Connect To BitPay").click()
     expect(current_url).to match(/#{ENV['BPDEVSERVER']}\/api-access-request\?pairingCode=[a-zA-Z0-9]{7}&redirect=#{old_url}/)
   end
   
