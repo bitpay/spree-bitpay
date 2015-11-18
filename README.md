@@ -19,6 +19,8 @@ For development and testing against the bitcoin testnet, sign up at https://test
 
 ## Installation
 
+## Last Version Tested: 2.2.1
+
 ### Environment
 
 `spree-bitpay` relies on the `bitpay-rails` gem, which requires two environment variables to be set: `BPSECRET` and `BPSALT`. **You must set these environment variables**.
