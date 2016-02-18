@@ -96,8 +96,14 @@ The BitPay Spree connector uses RSpec, Capybara, and Poltergeist to perform inte
    $ source spec/set_constants.sh https://test.bitpay.com <yourusername> <yourpassword>
    $ bundle exec rake
 
-## Support
+## BitPay Support
 
-Questions?  Comments?  Suggestions?
+* [GitHub Issues](https://github.com/bitpay/spree-bitpay/issues)
+  * Open an issue if you are having issues with this plugin.
+* [Support](https://help.bitpay.com)
+  * BitPay merchant support documentation
 
-Contact us at support@bitpay.com
+### Spree Support
+
+* [Homepage](https://spreecommerce.com/)
+* [Documentation](https://guides.spreecommerce.com/developer/)
