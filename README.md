@@ -82,7 +82,7 @@ In the event Bitcoin checkout is abandoned or the invoice expires, the `Payment`
 
 When a payment is detected on the Bitcoin network, the `Payment` is marked `pending`, and the `Order` is set `complete`.  The user is presented with a confirmation screen.
 
-When the Bitcoin transaction is fully confirmed according to your BitPay [transaction speed settings](https://bitpay.com/order-settings), a callback is delivered to the `bitpay_notification_url`, and verified with the BitPay server.  At this stage the payment will be marked `complete`, and the fullfillment can proceed.
+When the Bitcoin transaction is fully confirmed according to your BitPay [transaction speed settings](https://bitpay.com/dashboard/settings/edit/order), a callback is delivered to the `bitpay_notification_url`, and verified with the BitPay server.  At this stage the payment will be marked `complete`, and the fullfillment can proceed.
 
 At any point, the details and current status of a BitPay payment can be viewed by clicking on the payment in the order detail screen
 
@@ -98,6 +98,15 @@ The BitPay Spree connector uses RSpec, Capybara, and Poltergeist to perform inte
 
 ## Support
 
-Questions?  Comments?  Suggestions?
+**BitPay Support:**
 
-Contact us at support@bitpay.com
+* [Github Issues](https://github.com/bitpay/wpmembership-plugin/issues)
+  * Open an Issue if you are having issues with this plugin.
+* [Support](https://help.bitpay.com)
+  * BitPay merchant support documentation
+
+**Spree Commerce Support:**
+
+* [Homepage](https://spreecommerce.com/)
+* [Developer Documentation](https://guides.spreecommerce.com/developer/)
+* [User Documentation](https://guides.spreecommerce.com/user/)
